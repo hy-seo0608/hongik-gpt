@@ -33,5 +33,6 @@
 | test        | test를 위한 코드                 | 링크   |
 | readmeImage | readme.md파일에 들어가는 이미지       | 링크   |
 
-
+## model
+https://drive.google.com/file/d/1ah38F0c2jBbwgLswXRSPFruS3EpzslyL/view?usp=sharing
 ## Example
