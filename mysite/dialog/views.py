@@ -48,4 +48,4 @@ class ChatbotView(LoginRequiredMixin, TemplateView):
         user_question = Question.objects.create(question_text=question)
         bot_response = self.send_question_to_server(question)
         # bot_message = Answer.objects.create(answer_text=bot_response, question=user_question)
-        return JsonResponse({"answer": bot_response["Answer"]})
+        return JsonResponse({"answer": bot_response["Answer"], "button" : bot_response["Button"]})

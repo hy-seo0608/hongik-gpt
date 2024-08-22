@@ -20,6 +20,7 @@ from django.shortcuts import redirect
 from dialog.views import ChatbotView
 
 urlpatterns = [
+    path("",ChatbotView.as_view()),
     path("admin/", admin.site.urls),
     path("dialog/", include("dialog.urls")),
     path("common/", include("common.urls")),
