@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Hongik-gpt</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
+    <script src="{% static 'header.js' %}"></script>
+    <!-- header.js 파일을 불러오기 -->
+  </head>
+
+  <body>
+    <div id="logout-container">
+      {% if user.is_authenticated %}
+        <div>{{ user.username }}</div>
+        <a href="{% url 'common:logout' %}">로그아웃</a>
+      {% else %}
+        <div>로그인 안되어있음</div>
+      {% endif %}
+    </div>
+
+    <div id="chat-container">
+      <h1>Hongik-gpt</h1>
+      <div id="chat-box" class="chat-content">
+        <!-- 페이지가 로드될 때 인사 메세지 나타내기 -->
+      </div>
+
+      <input type="text" id="question" class="chat_input" placeholder="Ask a question">
+      <input type="button" id="ask-button" class="send_btn" value="Ask">
+    </div>
+    <script src={% static "bot.js" %}></script>
+  </body>
+
+</html>
