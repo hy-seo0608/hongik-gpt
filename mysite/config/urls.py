@@ -17,10 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.shortcuts import redirect
-from dialog.views import ChatbotView
+from dialog import views
 
 urlpatterns = [
-    path("",ChatbotView.as_view()),
+    path("", views.index),
     path("admin/", admin.site.urls),
     path("dialog/", include("dialog.urls")),
     path("common/", include("common.urls")),

@@ -7,7 +7,7 @@ from common.forms import UserForm
 
 def logout_view(request):
     logout(request)
-    return redirect("dialog:index")
+    return redirect("common:login")
 
 
 def signup(request):
