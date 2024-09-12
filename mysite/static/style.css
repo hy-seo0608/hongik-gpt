@@ -170,3 +170,26 @@ body {
 #logout-container a:hover {
     background-color: #0056b3;
 }
+
+#buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3개의 동일한 칸 */
+  gap: 10px; /* 버튼 사이의 간격 */
+}
+
+.button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px; /* 패딩을 줄여 버튼 크기 축소 */
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+  text-align: center;
+  font-size: 14px; /* 글자 크기도 줄임 */
+  cursor: pointer;
+}
+
+.button:hover {
+  background-color: #0056b3;
+}
