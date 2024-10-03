@@ -12,15 +12,25 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 import os
+<<<<<<< HEAD
+=======
+import environ
+>>>>>>> pr/2
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 LOGIN_REDIRECT_URL = "/dialog"
+<<<<<<< HEAD
+=======
+env = environ.Env()
+environ.Env.read_env(BASE_DIR / ".env")
+>>>>>>> pr/2
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+<<<<<<< HEAD
 SECRET_KEY = "django-insecure-+o3-*&kp&9v)1jzpbk4=2=^9d#(mo7-8r*%_)@n#k39q1j9xm8"
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -28,6 +38,16 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+=======
+
+SECRET_KEY = env("SECRET_KEY")
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = env("DEBUG")
+
+
+ALLOWED_HOSTS = ["3.39.93.156"]
+>>>>>>> pr/2
 
 # Application definition
 
@@ -94,7 +114,10 @@ DATABASES = {
     }
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> pr/2
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
 
