@@ -1,1 +1,3 @@
 mysite/.env
+*.pyc
+__pycahce__/
