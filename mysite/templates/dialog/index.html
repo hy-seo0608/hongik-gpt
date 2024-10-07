@@ -1,35 +1,63 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang ="en">
+<html lang="en">
 
-<head>
+  <head>
     <meta charset="UTF-8">
     <title>Hongik-gpt</title>
     <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
-    <script src="{% static 'bot.js' %}"></script> <!-- bot.js 파일을 불러오기 -->
-</head>
+    <script src="{% static 'header.js' %}"></script>
+    <!-- header.js 파일을 불러오기 -->
+  </head>
 
-<body>
+  <body>
     <div id="logout-container">
-        {% if user.is_authenticated %}
-            <div>{{ user.username }}</div>
-            <a href="{% url 'common:logout' %}">로그아웃</a>
-        {% else %}
-            <div>로그인 안되어있음</div>
-        {% endif %}
+      {% if user.is_authenticated %}
+        <div>{{ user.username }}</div>
+        <a href="{% url 'common:logout' %}">로그아웃</a>
+      {% else %}
+        <div>로그인 안되어있음</div>
+      {% endif %}
     </div>
 
     <div id="chat-container">
-        <h1>Hongik-gpt</h1>
-        <div id="chat-box" class="chat-content">
-            <!-- 페이지가 로드될 때 인사 메세지 나타내기 -->
-        </div>
+      <h1>Hongik-gpt</h1>
+      <div id="chat-box" class="chat-content">
+        <!-- 페이지가 로드될 때 인사 메세지 나타내기 -->
+        <div class="msg_box receive">
+          <span>
+            <strong>Bot:</strong>
+            안녕하세요! 홍익대학교 챗봇 Hongik-gpt입니다:)
+            <br>
+            학교에 대해 궁금한 것을 물어보세요!
+            <br>
+            <br>
+            <div id="buttons" class="buttons">
+              <div class="row">
+                <div class="button">학식</div>
+                <div class="button">편의시설</div>
+                <div class="button">연락처</div>
+              </div>
+              <div class="row">
+                <div class="button">학사일정</div>
+                <div class="button">공지사항</div>
+                <div class="button">날씨</div>
+              </div>
+              <div class="row">
+                <div class="button">홍대 기본 상식</div>
+                <div class="button">졸업 요건 조회</div>
+                <div class="button">열람실 현황</div>
+              </div>
+            </div>
+          </div>
 
-        <form id="form" method="post">
-            {% csrf_token %}
-            <input type="text" id="question" class="chat_input" placeholder="Ask a question">
-            <input type="button" id="ask-button" class="send_btn" value="Ask" onclick="askQuestion()">
-        </form>
+        </span>
+      </div>
+
+      <input type="text" id="question" class="chat_input" placeholder="Ask a question">
+      <input type="button" id="ask-button" class="send_btn" value="Ask">
     </div>
-</body>
+    <script src={% static "bot.js" %}></script>
+  </body>
+
 </html>
