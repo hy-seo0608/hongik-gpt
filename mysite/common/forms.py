@@ -16,7 +16,7 @@ class UserForm(UserCreationForm):
 
         email = cleaned_data.get("email")
 
-        if email and not email.endswith("@naver.com"):
-            self.add_error("email", ValidationError("이메일은 @naver.com 도메인만 사용할 수 있습니다."))
+        if email and not email.endswith("@hongik.ac.kr"):
+            self.add_error("email", ValidationError("학교 이메일 (@hongik.ac.kr)을 입력해주세요"))
 
         return cleaned_data
