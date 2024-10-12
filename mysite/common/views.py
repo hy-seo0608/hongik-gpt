@@ -53,6 +53,7 @@ def signup(request):
     return render(request, "common/signup.html", {"form": form})
 
 
+
 def activate(request, uid64, token):
 
     uid = force_str(urlsafe_base64_decode(uid64))
@@ -65,7 +66,6 @@ def activate(request, uid64, token):
         return redirect("/")
     else:
         return HttpResponse("비정상적인 접근입니다.")
-
-
+      
 def page_not_found(request, exception):
     return render(request, "common/404.html", {})
