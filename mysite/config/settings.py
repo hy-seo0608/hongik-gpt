@@ -29,7 +29,19 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env("DEBUG")=='True'
+DEBUG = env("DEBUG") == "True"
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"  # gmail시 smtp.gmail.com
+EMAIL_PORT = "587"
+EMAIL_HOST_USER = env("EMAIL_HOST_USER")  # gmail시 gmail email
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")  # gmail시 구글 앱 비밀번호
+EMAIL_USE_TLS = True
+DEFAULT_FORM_EMAIL = EMAIL_HOST_USER
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1
+ACCOUNT_EMAIL_SUBJECT_PREFIX = "연습중이다"
+
+SITE_ID = 1
 
 
 ALLOWED_HOSTS = ["3.39.93.156"]
@@ -39,7 +51,7 @@ ALLOWED_HOSTS = ["3.39.93.156"]
 INSTALLED_APPS = [
     "common.apps.CommonConfig",
     "dialog.apps.DialogConfig",
-    'corsheaders',
+    "corsheaders",
     "channels",
     "daphne",
     "django.contrib.admin",
@@ -51,8 +63,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware', 
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",

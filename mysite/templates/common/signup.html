@@ -13,7 +13,7 @@
       <h1>회원가입</h1>
       <form method="post" onsubmit='return check()' action="{% url 'common:signup' %}">
         {% csrf_token %}
-        {% include 'form_errors.html' %}
+        {% include 'common/form_errors.html' %}
         <div class="input-group">
           <label for="username">사용자 이름</label>
           <input type="text" name="username" id="username" value="{{ form.username.value|default_if_none:'' }}">
