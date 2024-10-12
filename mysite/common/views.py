@@ -48,8 +48,8 @@ def signup(request):
                 "입력하신 이메일<span>로 인증 링크가 전송되었습니다.</span>"
                 "</div>"
             )
-        else:
-            form = UserForm()
+    else:
+        form = UserForm()
     return render(request, "common/signup.html", {"form": form})
 
 
