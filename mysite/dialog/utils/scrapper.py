@@ -196,4 +196,7 @@ class Scrapper:
 
 if __name__ == "__main__":
     a = Scrapper()
+    a.get_food_list()
+    a.get_notice()
+    a.get_phone_number('1', 1)
     a.get_studyroom_status('1', 1)

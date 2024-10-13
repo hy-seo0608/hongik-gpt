@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-answer_file_path = "dataset/의도분류질문_0901.xlsx"
+answer_file_path = "dataset/answerfile.xlsx"
 df = pd.read_excel(answer_file_path)
 
 print(df.iloc[170])
