@@ -25,6 +25,12 @@ def logout_view(request):
 def signup(request):
     if request.method == "POST":
         form = UserForm(request.POST)
+
+        exUser = User.objects.filter(username=request.POST["username"])
+
+        if exUser and not exUser.is_active:
+            exUser.delete()
+
         if form.is_valid():
             user = User.objects.create_user(username=request.POST["username"], password=request.POST["password1"], email=request.POST["email"])
             user.is_active = False
