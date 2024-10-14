@@ -39,12 +39,11 @@ EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")  # gmail시 구글 앱 비밀�
 EMAIL_USE_TLS = True
 DEFAULT_FORM_EMAIL = EMAIL_HOST_USER
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1
-ACCOUNT_EMAIL_SUBJECT_PREFIX = "연습중이다"
 
 SITE_ID = 1
 
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["3.39.93.156"]
 
 # Application definition
 
@@ -109,11 +108,14 @@ CHANNEL_LAYERS = {
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": env("DB_NAME"),
+        "USER": env("DB_USER"),
+        "PASSWORD": env("DB_PASSWORD"),
+        "HOST": env("DB_HOST"),
+        "PORT": "3306",
     }
 }
-
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
 

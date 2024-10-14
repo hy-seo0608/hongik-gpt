@@ -2,9 +2,7 @@ mysite/.env
 mystie/.env.db
 *.pyc
 __pycahce__/
-<<<<<<< Updated upstream
 .DS_Store
-=======
 mysite/nohup.out
 .idea
->>>>>>> Stashed changes
+db.sqlite3
