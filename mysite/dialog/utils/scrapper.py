@@ -103,31 +103,35 @@ class Scrapper:
         browser.get(base_url)
         browser.implicitly_wait(10)
         soup = BeautifulSoup(browser.page_source, "html.parser")
-
-        if mode == 1:
-            query_result = soup.find("div", "bn-list-card faculty").ul.li
-            data = OrderedDict()
-            data["name"] = query_result.find("div", "b-name-box").p.text
-            data["belong"] = query_result.find("p", "b-belong").text
-            data["spot"] = query_result.find("p", "b-spot").text
-            data["phone_num"] = query_result.find("a", {"title": "전화걸기"}).text.strip()
-
-            with open("phone_number.json", "w") as f:
-                json.dump(data, f, ensure_ascii=False, indent="\t")
-        else:
-            data_list = []
-            query_result = soup.find("div", "bn-list-card phone-search")
-            for query in query_result.ul.find_all("li", recursive=False):
+        try :         
+            if mode == 1:
+                query_result = soup.find("div", "bn-list-card faculty").ul.li
                 data = OrderedDict()
-                data["name"] = query.find("p").text.strip().replace(" ", "")
-                phone_num = query.find("ul", "ul-type01").li
-                data["phone_num"] = phone_num.text if phone_num is not None else "there is no phone number"
-                data_list.append(data)
+                data["name"] = query_result.find("div", "b-name-box").p.text
+                data["belong"] = query_result.find("p", "b-belong").text
+                data["spot"] = query_result.find("p", "b-spot").text
+                data["phone_num"] = query_result.find("a", {"title": "전화걸기"}).text.strip()
 
-            with open("phone_number.json", "w") as f:
-                json.dump(data_list, f, ensure_ascii=False, indent="\t")
+                with open("phone_number.json", "w") as f:
+                    json.dump(data, f, ensure_ascii=False, indent="\t")
+                return data
+            else:
+                data_list = []
+                query_result = soup.find("div", "bn-list-card phone-search")
+                for query in query_result.ul.find_all("li", recursive=False):
+                    data = OrderedDict()
+                    data["name"] = query.find("p").text.strip().replace(" ", "")
+                    phone_num = query.find("ul", "ul-type01").li
+                    data["phone_num"] = phone_num.text if phone_num is not None else "there is no phone number"
+                    data_list.append(data)
+
+                with open("phone_number.json", "w") as f:
+                    json.dump(data_list, f, ensure_ascii=False, indent="\t")
+                return data
+        except : 
+            return {}
     
-    def get_studyroom_status(self, search_query, mode) :
+    def get_studyroom_status(self, mode) :
         # mode 0 : 학관, mode 1 : T동, mode 2 : R동
         '''
         academy_studyroom_url = 'http://203.249.67.222/'
@@ -178,22 +182,28 @@ class Scrapper:
             
             for status in studyroom_status:
                 print(status)
+            return studyroom_status
         else:
             print("No tables found.")
+            return []
 
-        # 특정 <td> 요소 찾기
-        td_element = soup.find("td", {"id": "tbl_table", "colspan": "2"})
+        # # 특정 <td> 요소 찾기
+        # td_element = soup.find("td", {"id": "tbl_table", "colspan": "2"})
         
-        if td_element:
-            print(td_element.prettify())
-        else:
-            print("Element not found.")
-
-        browser.quit()
+        # if td_element:
+        #     print(td_element.prettify())
+        # else:
+        #     print("Element not found.")
 
         
 
 
 if __name__ == "__main__":
     a = Scrapper()
-    a.get_studyroom_status('1', 1)
+    # a.get_food_list()
+    # a.get_notice()
+    # d1 = a.get_phone_number('요건없을걸', 0)
+    # d2 = a.get_phone_number('배성일', 1)
+    a.get_studyroom_status(0) 
+    a.get_studyroom_status(1) 
+    a.get_studyroom_status(2) 

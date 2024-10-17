@@ -16,7 +16,7 @@ from ..apps import DialogConfig
 
 
 model = SentenceTransformer("snunlp/KR-SBERT-V40K-klueNLI-augSTS")
-df = pd.read_excel("dataset/의도분류질문_test0728.xlsx")
+df = pd.read_excel("dataset/answerfile_template.xlsx")
 sentences = [df.iloc[i, 1] for i in range(len(df))]
 embedding_vectors = [model.encode(sentence) for sentence in sentences]
 
