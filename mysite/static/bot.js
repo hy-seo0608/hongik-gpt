@@ -105,12 +105,14 @@ function addContactButton() {
 	button1.textContent = "교직원/교수 연락처";
 	button1.onclick = function () {
 		addMessage("Bot", "검색하고 싶은 교직원/교수를 입력해주세요");
+		md = 3;
 	};
 
 	const button2 = document.createElement("button");
 	button2.textContent = "학과 연락처";
 	button2.onclick = function () {
 		addMessage("Bot", "검색하고 싶은 학과를 입력해주세요");
+		md = 3;
 	};
 
 	buttonDiv.appendChild(button1);
