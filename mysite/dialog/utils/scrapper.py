@@ -13,7 +13,11 @@ class Scrapper:
         staff_url = "https://www.hongik.ac.kr/kr/life/seoul-cafeteria-view.do?articleNo=5414&restNo=3"
         dormitory_url = "https://www.hongik.ac.kr/kr/life/seoul-cafeteria-view.do?articleNo=5413&restNo=3"
         options = Options()
+        options.add_argument("--headless")
+        options.add_argument("--blink-settings=imagesEnabled=false")
         options.add_argument("--no-sandbox")
+        options.add_argument("enable-automation")
+        options.add_argument("--disable-gpu")
         options.add_argument("--disable-dev-shm-usage")
 
         def get_data_list(url):
@@ -57,7 +61,11 @@ class Scrapper:
         base_url = "https://ko.hongik.ac.kr/front/boardlist.do?bbsConfigFK=54&siteGubun=1&menuGubun=1"
         add_url = "https://ko.hongik.ac.kr/"
         options = Options()
+        options.add_argument("--headless")
+        options.add_argument("--blink-settings=imagesEnabled=false")
         options.add_argument("--no-sandbox")
+        options.add_argument("enable-automation")
+        options.add_argument("--disable-gpu")
         options.add_argument("--disable-dev-shm-usage")
 
         browser = webdriver.Chrome(options=options)
@@ -95,15 +103,20 @@ class Scrapper:
             base_url = base_url + f"?mode=list&srSearchKey=name&srSearchVal={search_query}"
         else:
             base_url = base_url + f"?mode=list&srSearchKey=onename&srSearchVal={search_query}"
+
         options = Options()
+        options.add_argument("--headless")
+        options.add_argument("--blink-settings=imagesEnabled=false")
         options.add_argument("--no-sandbox")
+        options.add_argument("enable-automation")
+        options.add_argument("--disable-gpu")
         options.add_argument("--disable-dev-shm-usage")
 
         browser = webdriver.Chrome(options=options)
         browser.get(base_url)
         browser.implicitly_wait(10)
         soup = BeautifulSoup(browser.page_source, "html.parser")
-        try :         
+        try:
             if mode == 1:
                 query_result = soup.find("div", "bn-list-card faculty").ul.li
                 data = OrderedDict()
@@ -128,27 +141,31 @@ class Scrapper:
                 with open("phone_number.json", "w") as f:
                     json.dump(data_list, f, ensure_ascii=False, indent="\t")
                 return data
-        except : 
+        except:
             return {}
-    
-    def get_studyroom_status(self, mode) :
+
+    def get_studyroom_status(self, mode):
         # mode 0 : 학관, mode 1 : T동, mode 2 : R동
-        '''
+        """
         academy_studyroom_url = 'http://203.249.67.222/'
         T_studyroom_url = 'http://203.249.65.81/'
         R_studyroom_url = 'http://223.194.83.66/'
-        '''
+        """
 
-        url = ['http://203.249.67.222/', 'http://203.249.65.81/', 'http://223.194.83.66/']
+        url = ["http://203.249.67.222/", "http://203.249.65.81/", "http://223.194.83.66/"]
         url_to_studyroom_num = {
-            url[0] : 4,
-            url[1] : 4 ,
-            url[2] : 1, 
+            url[0]: 4,
+            url[1]: 4,
+            url[2]: 1,
         }
         base_url = url[mode]
 
         options = Options()
+        options.add_argument("--headless")
+        options.add_argument("--blink-settings=imagesEnabled=false")
         options.add_argument("--no-sandbox")
+        options.add_argument("enable-automation")
+        options.add_argument("--disable-gpu")
         options.add_argument("--disable-dev-shm-usage")
 
         browser = webdriver.Chrome(options=options)
@@ -158,7 +175,7 @@ class Scrapper:
 
         # Table 찾기
         tables = soup.find_all("table", {"cellpadding": "0", "cellspacing": "0", "border": "0", "width": "100%"})
-        
+
         if tables:
             studyroom_status = []
             for table in tables:
@@ -171,15 +188,16 @@ class Scrapper:
                         used_seats = cols[2].text.strip()
                         remaining_seats = cols[3].text.strip()
                         utilization_rate = cols[4].text.strip()
-                        studyroom_status.append({
-                            "room_name": room_name,
-                            "total_seats": total_seats,
-                            "used_seats": used_seats,
-                            "remaining_seats": remaining_seats,
-                            "utilization_rate": utilization_rate
-                        })
-        
-            
+                        studyroom_status.append(
+                            {
+                                "room_name": room_name,
+                                "total_seats": total_seats,
+                                "used_seats": used_seats,
+                                "remaining_seats": remaining_seats,
+                                "utilization_rate": utilization_rate,
+                            }
+                        )
+
             for status in studyroom_status:
                 print(status)
             return studyroom_status
@@ -189,21 +207,21 @@ class Scrapper:
 
         # # 특정 <td> 요소 찾기
         # td_element = soup.find("td", {"id": "tbl_table", "colspan": "2"})
-        
+
         # if td_element:
         #     print(td_element.prettify())
         # else:
         #     print("Element not found.")
 
-        
-
 
 if __name__ == "__main__":
     a = Scrapper()
-    # a.get_food_list()
-    # a.get_notice()
-    # d1 = a.get_phone_number('요건없을걸', 0)
-    # d2 = a.get_phone_number('배성일', 1)
-    a.get_studyroom_status(0) 
-    a.get_studyroom_status(1) 
-    a.get_studyroom_status(2) 
+    print(a.get_food_list())
+    print(a.get_notice())
+    d1 = a.get_phone_number("요건없을걸", 0)
+    d2 = a.get_phone_number("배성일", 1)
+    print(d1)
+    print(d2)
+    a.get_studyroom_status(0)
+    a.get_studyroom_status(1)
+    a.get_studyroom_status(2)
