@@ -229,3 +229,34 @@ body {
     font-size: 0.875em;
     margin-top: 10px;   
 }
+
+
+
+#loading-container {
+    display: flex;
+    align-items: center; /* 수직 중앙 정렬 */
+    font-family: Arial, sans-serif;
+    color: #555;
+}
+
+/* 로딩 텍스트 스타일 */
+#loading-text {
+    font-size: 24px;
+    margin-right: 10px; /* 텍스트와 스피너 사이 간격 조절 */
+}
+
+/* 로딩 스피너 스타일 */
+#loading-spinner {
+    border: 8px solid #f3f3f3; /* 밝은 회색 테두리 */
+    border-top: 8px solid #3498db; /* 파란색 윗부분 테두리 */
+    border-radius: 50%; /* 원형으로 만들기 */
+    width: 40px; /* 스피너의 가로 크기 줄이기 */
+    height: 40px; /* 스피너의 세로 크기 줄이기 */
+    animation: spin 1s linear infinite; /* 회전 애니메이션 적용 */
+}
+
+/* 회전 애니메이션 키프레임 정의 */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

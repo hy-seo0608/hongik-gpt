@@ -1,18 +1,6 @@
-[
-	{
-		"name": "대학>공과대학>컴퓨터공학과",
-		"phone_num": "02-320-1105"
-	},
-	{
-		"name": "대학원>일반대학원>컴퓨터공학과",
-		"phone_num": "02-320-1257"
-	},
-	{
-		"name": "대학>과학기술대학>전자전기컴퓨터공학부",
-		"phone_num": "there is no phone number"
-	},
-	{
-		"name": "대학>과학기술대학>전자전기컴퓨터공학부",
-		"phone_num": "there is no phone number"
-	}
-]
+{
+	"name": "배성일",
+	"belong": "공과대학 컴퓨터공학과",
+	"spot": "부교수",
+	"phone_num": "02-320-3034"
+}

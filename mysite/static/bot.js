@@ -3,6 +3,7 @@ const $question = document.querySelector("#question");
 const $submitBtn = document.querySelector("#ask-button");
 const webSocket = new WebSocket("ws://" + window.location.host + "/ws/dialog");
 const $$buttons = document.querySelectorAll(".button");
+let $botsChat;
 let md = 0;
 let received = true;
 //button function
@@ -18,9 +19,9 @@ Array.from($$buttons).forEach((button) => {
 webSocket.onmessage = function (event) {
 	received = true;
 	const data = JSON.parse(event.data);
+	$botsChat.querySelector("#message").innerHTML = `<strong>Bot:</strong>${data.message}`;
 	if (data.mode == 0) {
 		md = 0;
-		addMessage("Bot", data.message);
 	} else if (data.mode == 1) {
 		// 학사일정
 		md = 0;
@@ -59,10 +60,21 @@ function submitMessage(message) {
 	if (!received) return;
 	received = false;
 	addMessage("You", message);
+	addLoading();
 	webSocket.send(JSON.stringify({ message: message, mode: md }));
 	$question.value = "";
 }
 //WebSocket methods END
+
+function addLoading() {
+	const loadingDiv = document.createElement("div");
+	loadingDiv.classList.add("msg_box");
+	loadingDiv.classList.add("receive");
+	loadingDiv.innerHTML = `<span id="message"><strong>Bot:</strong><div>로딩 중 인데용</div><div id ="loading-spinner"></div><span> `;
+	$chatBox.appendChild(loadingDiv);
+	$chatBox.scrollTop = $chatBox.scrollHeight;
+	$botsChat = loadingDiv;
+}
 
 function addMessage(sender, message) {
 	const messageDiv = document.createElement("div");
