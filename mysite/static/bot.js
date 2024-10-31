@@ -9,7 +9,7 @@ let received = true;
 //button function
 Array.from($$buttons).forEach((button) => {
 	button.addEventListener("click", (event) => {
-		submitMessage(event.target.textContent);
+		submitMessage(event.target.textContent, md);
 	});
 });
 
@@ -53,15 +53,15 @@ $question.onkeyup = function (event) {
 $submitBtn.onclick = function () {
 	const message = $question.value;
 	if (message === "") return;
-	submitMessage(message);
+	submitMessage(message, md);
 };
 
-function submitMessage(message) {
+function submitMessage(message, my_mode) {
 	if (!received) return;
 	received = false;
 	addMessage("You", message);
 	addLoading();
-	webSocket.send(JSON.stringify({ message: message, mode: md }));
+	webSocket.send(JSON.stringify({ message: message, mode: my_mode }));
 	$question.value = "";
 }
 //WebSocket methods END
@@ -106,8 +106,7 @@ function addButton(button_list, mode) {
 // 사용자가 특정 옵션 버튼을 클릭한 경우
 function handleButtonClick(option, mode) {
 	// 사용자가 클릭한 버튼 옵션을 대화창에 표시
-	addMessage("You", option); // 사용자의 옵션을 질문처럼 처리
-	webSocket.send(JSON.stringify({ message: option, mode: mode }));
+	submitMessage(option, mode);
 }
 
 function addContactButton() {
