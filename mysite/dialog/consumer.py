@@ -4,6 +4,8 @@ from .utils.intent import predict
 from .utils.FindAnswer import FindAnswer
 from .utils.scrapper import Scrapper
 from .apps import DialogConfig
+import time
+
 
 # HTML 테이블 생성 함수
 def generate_html_table(data):
@@ -23,7 +25,6 @@ def generate_html_table(data):
 
     html += "</table>\n"
     return html
-
 
 
 class DialogConsumer(AsyncJsonWebsocketConsumer):
@@ -46,19 +47,19 @@ class DialogConsumer(AsyncJsonWebsocketConsumer):
         elif mode == 1:
             return_message, button_lst, mode = FindAnswer(pred)
         elif mode == 2:  # 열람실 현황 크롤링 후 return
-            return_message = "" 
+            return_message = ""
             scrapper = Scrapper()
             status_list = []
-            if message == "학관 열람실" : 
+            if message == "학관 열람실":
                 status_list = scrapper.get_studyroom_status(0)
-            elif message == "T동 열람실" : 
+            elif message == "T동 열람실":
                 status_list = scrapper.get_studyroom_status(1)
-            elif message == "R동 열람실 " : 
+            elif message == "R동 열람실 ":
                 status_list = scrapper.get_studyroom_status(2)
-            
-            if status_list : 
+
+            if status_list:
                 return_message = generate_html_table(status_list)
-            else : 
+            else:
                 return_message = "열람실 정보를 찾을 수 없습니다."
             button_lst = []
             mode = 0
@@ -67,11 +68,11 @@ class DialogConsumer(AsyncJsonWebsocketConsumer):
             d1 = scrapper.get_phone_number(message, 0)  # Office
             d2 = scrapper.get_phone_number(message, 1)  # person
 
-            if d1 :
+            if d1:
                 return_message = f"{d1['name']} 연락처 입니다.\n\n전화번호 :{d1['phone_num']}"
-            elif d2 : 
+            elif d2:
                 return_message = f"{d2['name']}님의 연락처 입니다.\n\n전화번호 :{d2['phone_num']}"
-            else : 
+            else:
                 return_message = "연락처를 찾을 수 없습니다."
             button_lst = []
             mode = 0
