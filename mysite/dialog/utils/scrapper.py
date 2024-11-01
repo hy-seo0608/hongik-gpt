@@ -197,7 +197,6 @@ class Scrapper:
 
 if __name__ == "__main__":
     a = Scrapper()
-
     # print(a.options.arguments)
     # print(a.get_food_list())
     print(a.get_notice())
