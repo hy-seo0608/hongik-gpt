@@ -62,16 +62,24 @@ def update_food_list(excel_file_path):
     sheet = workbook.active  # 활성화된 시트 선택
 
     scraper.get_food_list()
-    food_df = pd.read_json('food_list.json')
+    # food_df = pd.read_json('food_list.json')
+    # JSON 파일 로드
+    with open('food_list.json', 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    # 각 섹션을 개별 데이터프레임으로 변환
+    dormitory_df = pd.DataFrame(data['dormitory'])
+    # print(dormitory_df)
+    staff_df = pd.DataFrame(data['staff'])
+    # print(staff_df)
     
     # 리스트를 문자열로 변환하여 엑셀에 저장
-    sheet['B2'] = ', '.join(food_df['dormitory'][0]["menu"])
-    sheet['B3'] = ', '.join(food_df['dormitory'][1]["menu"])
-    sheet['B4'] = ', '.join(food_df['dormitory'][2]["menu"])
+    sheet['B2'] = ', '.join(dormitory_df.iloc[0]["menu"])
+    sheet['B3'] = ', '.join(dormitory_df.iloc[1]["menu"])
+    sheet['B4'] = ', '.join(dormitory_df.iloc[2]["menu"])
 
-    sheet['B5'] = ', '.join(food_df['staff'][0]["menu"])
-    sheet['B6'] = ', '.join(food_df['staff'][1]["menu"])
-    sheet['B7'] = ', '.join(food_df['staff'][2]["menu"])
+    sheet['B5'] = ', '.join(staff_df.iloc[0]["menu"])
+    sheet['B6'] = ', '.join(staff_df.iloc[1]["menu"])
+    sheet['B7'] = ', '.join(staff_df.iloc[2]["menu"])
 
     workbook.save(renewfile_path)
     
