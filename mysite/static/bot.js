@@ -6,10 +6,24 @@ const $$buttons = document.querySelectorAll(".button");
 let $botsChat;
 let md = 0;
 let received = true;
+
+const buttonQuestion = [
+	"학식을 알려줘",
+	"편의시설이 궁금해",
+	"연락처 검색을 하고 싶어",
+	"학사일정 알려줘",
+	"공지사항 올라온 거 있어?",
+	"홍대 주변 날씨는 어떄?",
+	"홍대 기본 상식을 알려줘",
+	"졸업 요건 검색을 해줘",
+	"지금 열람실 현황은 어떄?",
+];
 //button function
 Array.from($$buttons).forEach((button) => {
 	button.addEventListener("click", (event) => {
-		submitMessage(event.target.textContent, md);
+		const index = parseInt(event.target.id);
+		console.log(buttonQuestion[index]);
+		submitMessage(buttonQuestion[index], md);
 	});
 });
 
