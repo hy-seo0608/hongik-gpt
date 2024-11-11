@@ -3,10 +3,10 @@ import time
 import updatefile
 import renew
 
-renewfile_path = './mysite/dataset/renew.xlsx'
-std_excel_file_path = './mysite/dataset/answerfile_template.xlsx'         # 원본 엑셀 파일 경로
-renew_excel_file_path = './mysite/dataset/renew.xlsx'         # 크롤링 후 갱신하는 파일 경로
-new_file_path = './mysite/dataset/answerfile.xlsx'       # 새롭게 저장할 엑셀 파일 경로
+renewfile_path = '../../dataset/renew.xlsx'
+std_excel_file_path = '../../dataset/answerfile_template.xlsx'         # 원본 엑셀 파일 경로
+renew_excel_file_path = '../../dataset/renew.xlsx'         # 크롤링 후 갱신하는 파일 경로
+new_file_path = '../../dataset/answerfile.xlsx'       # 새롭게 저장할 엑셀 파일 경로
 
 # 정해진 시간마다 실행할 함수 정의
 def run_updatefile():
