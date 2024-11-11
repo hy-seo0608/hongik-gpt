@@ -200,7 +200,7 @@ if __name__ == "__main__":
 
     # print(a.options.arguments)
     # print(a.get_food_list())
-    print(a.get_notice())
+    # print(a.get_notice())
     # d1 = a.get_phone_number("요건없을걸", 0)
     # d2 = a.get_phone_number("배성일", 1)
     # print(d1)

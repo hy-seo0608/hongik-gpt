@@ -12,11 +12,54 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 
 import socket, json
-from .models import Question, Answer
+import pandas as pd
+from .utils.FindAnswer import FindAnswer
+from .forms import FeedbackForm
+from .models import Feedback
 
-# Create your views here.
-
-
+# 챗봇 응답 처리 뷰
 @login_required(login_url="common/login")
 def index(request):
     return render(request, "dialog/index.html")
+
+@login_required
+def get_answer(request, question_id):
+    """
+    Get the chatbot's answer along with the responseId for feedback
+    """
+    # Get the response from FindAnswer based on question_id
+    response_message, buttons, mode = FindAnswer(question_id)
+    
+    # Prepare JSON response with responseId
+    response_data = {
+        "message": response_message,
+        "mode": mode,
+        "button": buttons,
+        "responseId": question_id,  # Use question_id as responseId
+    }
+    return JsonResponse(response_data)
+
+# 피드백 저장 뷰
+@login_required
+def feedback_save(request):
+    """
+    Save feedback data received from the user
+    """
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        feedback_text = data.get('feedback')
+        response_id = data.get('responseId')  # responseId 가져오기
+
+        # 새로운 Feedback 객체를 저장
+        Feedback.objects.create(
+            user=request.user,
+            user_question=data.get('user_question', ''),
+            model_classification=data.get('model_classification', ''),
+            model_answer=data.get('model_answer', ''),
+            user_intended_classification=data.get('user_intended_classification', ''),
+            user_desired_answer=feedback_text
+        )
+        
+        return JsonResponse({"message": "피드백을 주셔서 감사합니다!"})
+    else:
+        return JsonResponse({"message": "잘못된 요청입니다."}, status=400)

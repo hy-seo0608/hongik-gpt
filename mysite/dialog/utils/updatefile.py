@@ -11,7 +11,7 @@ from weather import get_weather
 # Scrapper 클래스 인스턴스 생성
 scraper = Scrapper()
 
-renewfile_path = './mysite/dataset/renew.xlsx'
+renewfile_path = '/home/hyseo/hongik-gpt/mysite/dataset/renew.xlsx'
 # 요일을 한국어로 매핑하는 딕셔너리
 weekdays_korean = {
     'Monday': '월',
