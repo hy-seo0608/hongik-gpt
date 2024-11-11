@@ -21,8 +21,8 @@ def replace_marker_and_save_new_file(excel_file_path, renew_excel_file_path, new
     workbook.save(new_file_path)
 
 print(os.getcwd())
-std_excel_file_path = './mysite/dataset/answerfile_template.xlsx'         # 원본 엑셀 파일 경로
-renew_excel_file_path = './mysite/dataset/renew.xlsx'         # 크롤링 후 갱신하는 파일 경로
-new_file_path = './mysite/dataset/answerfile.xlsx'       # 새롭게 저장할 엑셀 파일 경로
+std_excel_file_path = '../../dataset/answerfile_template.xlsx'         # 원본 엑셀 파일 경로
+renew_excel_file_path = '../../dataset/renew.xlsx'         # 크롤링 후 갱신하는 파일 경로
+new_file_path = '../../dataset/answerfile.xlsx'       # 새롭게 저장할 엑셀 파일 경로
 
 replace_marker_and_save_new_file(std_excel_file_path, renew_excel_file_path, new_file_path)

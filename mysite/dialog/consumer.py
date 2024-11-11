@@ -5,6 +5,7 @@ from .utils.FindAnswer import FindAnswer
 from .utils.scrapper import Scrapper
 from .apps import DialogConfig
 import time
+import numpy as np
 
 
 # HTML 테이블 생성 함수
@@ -48,14 +49,14 @@ class DialogConsumer(AsyncJsonWebsocketConsumer):
             return_message, button_lst, mode = FindAnswer(pred)
         elif mode == 2:  # 열람실 현황 크롤링 후 return
             return_message = ""
-            scrapper = Scrapper()
             status_list = []
-            if message == "학관 열람실":
-                status_list = scrapper.get_studyroom_status(0)
-            elif message == "T동 열람실":
-                status_list = scrapper.get_studyroom_status(1)
-            elif message == "R동 열람실 ":
-                status_list = scrapper.get_studyroom_status(2)
+            if "학관 열람실" in message:
+                status_list = Scrapper().get_studyroom_status(mode=0)
+            elif "T동 열람실" in message:
+                print("여기는 실행됨")
+                status_list = Scrapper().get_studyroom_status(mode=1)
+            elif "R동 열람실" in message:
+                status_list = Scrapper().get_studyroom_status(mode=2)
 
             if status_list:
                 return_message = generate_html_table(status_list)
@@ -64,9 +65,8 @@ class DialogConsumer(AsyncJsonWebsocketConsumer):
             button_lst = []
             mode = 0
         elif mode == 3:  # 연락처 크롤링 후 return
-            scrapper = Scrapper()
-            d1 = scrapper.get_phone_number(message, 0)  # Office
-            d2 = scrapper.get_phone_number(message, 1)  # person
+            d1 = Scrapper().get_phone_number(message, 0)  # Office
+            d2 = Scrapper().get_phone_number(message, 1)  # person
 
             if d1:
                 return_message = f"{d1['name']} 연락처 입니다.\n\n전화번호 :{d1['phone_num']}"
@@ -78,4 +78,4 @@ class DialogConsumer(AsyncJsonWebsocketConsumer):
             mode = 0
 
         print(return_message, mode, button_lst)
-        await self.send(text_data=json.dumps({"message": return_message, "mode": mode, "button": button_lst}))
+        await self.send(text_data=json.dumps({"message": return_message, "mode": int(mode), "button": button_lst}))

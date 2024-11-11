@@ -33,6 +33,7 @@ class Scrapper:
 
         def get_data_list(url):
             BaseException
+            self.browser = webdriver.Chrome() 
             self.browser.get(url)
             WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "b-cafeteria-diet-list")))
             soup = BeautifulSoup(self.browser.page_source, "html.parser")
@@ -150,6 +151,7 @@ class Scrapper:
             url[2]: 1,
         }
         base_url = url[mode]
+        self.browser = webdriver.Chrome() 
         self.browser.get(base_url)
         self.browser.implicitly_wait(10)
         soup = BeautifulSoup(self.browser.page_source, "html.parser")
@@ -181,6 +183,8 @@ class Scrapper:
 
             for status in studyroom_status:
                 print(status)
+            if not studyroom_status :
+                print("there is no status")
             return studyroom_status
         else:
             print("No tables found.")
