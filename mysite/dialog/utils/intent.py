@@ -29,4 +29,5 @@ def predict(sentence):
 
     best_sim_idx = int(np.argmax(cos_sim))
     pred_sentence = df.iloc[best_sim_idx, 1]
+
     return best_sim_idx, pred_sentence

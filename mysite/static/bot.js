@@ -6,9 +6,15 @@ const $$buttons = document.querySelectorAll(".button");
 const $feedback =document.querySelector("#feedback-form");
 const modal=document.querySelector(".modal");
 $feedback.addEventListener('submit',submitFeedback);
+
 let $botsChat;
 let md = 0;
 let received = true;
+let loadingDiv;	// 로딩 메세지 변수
+
+// 피드백 테이블에 저장용
+let currentUserQuestion = "";		// 사용자 질문
+let currentBotResponse = ""; 		// 챗봇 응답
 
 //button function
 Array.from($$buttons).forEach((button) => {
@@ -17,13 +23,19 @@ Array.from($$buttons).forEach((button) => {
 	});
 });
 
+
 //WebSocket methods START
 
 //receive data from server
 webSocket.onmessage = function (event) {
 	received = true;
-	const data = JSON.parse(event.data);
-	addMessage("Bot", data.message, data.responseId); // responseId 추가
+	const data = JSON.parse(event.data); 
+	$botsChat.querySelector("#message").innerHTML = `<strong>Bot:</strong>${data.message}`;
+
+	// 챗봇 답변 메세지
+	currentBotResponse = data.message;  // 챗봇 응답 저장
+	addMessage("Bot", data.message, data.responseId);	// responseId 추가(피드백)
+	
 	if (data.mode == 0) {
 		md = 0;
 	} else if (data.mode == 1) {
@@ -40,6 +52,7 @@ webSocket.onmessage = function (event) {
 		addContactButton();
 	}
 };
+
 
 //WebSocket closed unexpectedly
 webSocket.onclose = function (event) {
@@ -66,9 +79,9 @@ function submitMessage(message, my_mode) {
     addMessage("You", message);
     addLoading();
     webSocket.send(JSON.stringify({ message: message, mode: my_mode }));
+	currentUserQuestion = message; // 사용자가 입력한 질문 저장
 	$question.value = "";
 }
-
 
 //WebSocket methods END
 
@@ -77,7 +90,7 @@ function addMessage(sender, message, responseId = null) {
 
 	messageDiv.classList.add("msg_box");
 	messageDiv.classList.add(sender === "You" ? "send" : "receive");
-	messageDiv.innerHTML = `<span><strong>${sender}:</strong> ${message}</span>`;
+	//messageDiv.innerHTML = `<span><strong>${sender}:</strong> ${message}</span>`;
 	
 	// 챗봇 응답에 피드백 버튼 추가
     if (sender === "Bot") {
@@ -90,11 +103,16 @@ function addMessage(sender, message, responseId = null) {
     $chatBox.scrollTop = $chatBox.scrollHeight;
 }
 
+
 // 피드백 서버로 전달
 function submitFeedback(event) {
 	event.preventDefault();
     const feedbackText = document.getElementById("feedback-text").value;
     const responseId = document.getElementById("feedback-form").dataset.responseId; // 모달에 저장된 responseId 가져오기
+	
+	// 디버그 출력
+    console.log("user_question:", currentUserQuestion);
+    console.log("model_answer:", currentBotResponse);
 
     fetch("dialog/feedback/", {
         method: "POST",
@@ -103,8 +121,10 @@ function submitFeedback(event) {
             'X-CSRFToken': getCookie('csrftoken') // CSRF 토큰 추가
         },
         body: JSON.stringify({
-            feedback: feedbackText,
-            responseId: responseId // 서버로 responseId 전달
+            user_desired_answer: feedbackText,  	// 사용자가 입력한 피드백
+            responseId: responseId, 	// 서버로 responseId 전달
+			user_question: currentUserQuestion, // 사용자 질문
+			model_answer: currentBotResponse 	// 챗봇 응답
         })
     })
     .then(response => response.json())

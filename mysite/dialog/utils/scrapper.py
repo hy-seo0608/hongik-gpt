@@ -27,42 +27,38 @@ class Scrapper:
             cls._instance = super(Scrapper, cls).__new__(cls)
         return cls._instance
 
-    def get_food_list(self):
-        dormitory_url = "https://www.hongik.ac.kr/kr/life/seoul-cafeteria-view.do?articleNo=5414&restNo=2"
-        staff_url = "https://www.hongik.ac.kr/kr/life/seoul-cafeteria-view.do?articleNo=5413&restNo=3"
+    def get_data_list(self, url):
+        self.browser.get(url)
+        WebDriverWait(self.browser, 30).until(EC.presence_of_element_located((By.CLASS_NAME, "b-cafeteria-diet-list")))
+        soup = BeautifulSoup(self.browser.page_source, "html.parser")
+        day_lists = soup.find("div", "b-cafeteria-diet-list").find_all("div", recursive=False)
+        data_list = []
 
-        def get_data_list(url):
-            BaseException
-            self.browser.get(url)
-            WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "b-cafeteria-diet-list")))
-            soup = BeautifulSoup(self.browser.page_source, "html.parser")
-            day_lists = soup.find("div", "b-cafeteria-diet-list").find_all("div", recursive=False)
-            data_list = []
+        for day in day_lists:
+            diet_list = day.find("div").find_all("div", recursive=False)
+            date = day.find("p").text
 
-            for day in day_lists:
-                diet_list = day.find("div").find_all("div", recursive=False)
-                date = day.find("p").text
+            for diet in diet_list:
+                data = OrderedDict()
+                data["date"] = date
+                time = diet.find("p").text
+                data["time"] = time
+                data["menu"] = []
+                menu_list = diet.find_all("li")
 
-                for diet in diet_list:
-                    data = OrderedDict()
-                    data["date"] = date
-                    time = diet.find("p").text
-                    data["time"] = time
-                    data["menu"] = []
-                    menu_list = diet.find_all("li")
+                for menu in menu_list:
+                    if not menu.text.rstrip():
+                        continue
+                    data["menu"].append(menu.text.rstrip())
 
-                    for menu in menu_list:
-                        if not menu.text.rstrip():
-                            continue
-                        data["menu"].append(menu.text.rstrip())
+                data_list.append(data)
+        print(data_list)
+        return data_list
 
-                    data_list.append(data)
-            print(data_list)
-            return data_list
-
+    def get_food_list(self, url):
         menu_list = OrderedDict()
-        menu_list["dormitory"] = get_data_list(dormitory_url)
-        menu_list["staff"] = get_data_list(staff_url)
+        menu_list["dormitory"] = self.get_data_list(dormitory_url)
+        menu_list["staff"] = self.get_data_list(staff_url)
 
         with open("food_list.json", "w") as f:
             json.dump(menu_list, f, ensure_ascii=False, indent="\t")
@@ -105,7 +101,7 @@ class Scrapper:
             base_url = base_url + f"?mode=list&srSearchKey=onename&srSearchVal={search_query}"
 
         self.browser.get(base_url)
-        self.browser.implicitly_wait(10)
+        WebDriverWait(self.browser, 30).until(EC.presence_of_element_located((By.CLASS_NAME, "bn-list-card")))
         soup = BeautifulSoup(self.browser.page_source, "html.parser")
         try:
             if mode == 1:
@@ -197,9 +193,10 @@ class Scrapper:
 
 if __name__ == "__main__":
     a = Scrapper()
-
-    # print(a.options.arguments)
-    # print(a.get_food_list())
+    dormitory_url = "https://www.hongik.ac.kr/kr/life/seoul-cafeteria-view.do?articleNo=5414&restNo=2"
+    staff_url = "https://www.hongik.ac.kr/kr/life/seoul-cafeteria-view.do?articleNo=5413&restNo=3"
+    # a.get_data_list(dormitory_url)
+    # a.get_data_list(staff_url)
     # print(a.get_notice())
     # d1 = a.get_phone_number("요건없을걸", 0)
     # d2 = a.get_phone_number("배성일", 1)
