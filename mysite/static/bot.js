@@ -16,12 +16,26 @@ let loadingDiv;	// 로딩 메세지 변수
 let currentUserQuestion = "";		// 사용자 질문
 let currentBotResponse = ""; 		// 챗봇 응답
 
+const buttonQuestion = [
+	"학식을 알려줘",
+	"편의시설이 궁금해",
+	"연락처 검색을 하고 싶어",
+	"학사일정 알려줘",
+	"공지사항 올라온 거 있어?",
+	"홍대 주변 날씨는 어떄?",
+	"홍대 기본 상식을 알려줘",
+	"졸업 요건 검색을 해줘",
+	"지금 열람실 현황은 어떄?",
+];
 //button function
 Array.from($$buttons).forEach((button) => {
 	button.addEventListener("click", (event) => {
-		submitMessage(event.target.textContent, md);
+		const index = parseInt(event.target.id);
+		console.log(buttonQuestion[index]);
+		submitMessage(buttonQuestion[index], md);
 	});
 });
+
 
 
 //WebSocket methods START
@@ -31,10 +45,14 @@ webSocket.onmessage = function (event) {
 	received = true;
 	const data = JSON.parse(event.data); 
 	$botsChat.querySelector("#message").innerHTML = `<strong>Bot:</strong>${data.message}`;
-
+	// 챗봇 응답에 피드백 버튼 추가
+	const feedbackButton = addFeedbackButton(data.responseId);
+	feedbackButton.classList.add("feedback-button");
+	$botsChat.appendChild(feedbackButton);
+	
 	// 챗봇 답변 메세지
 	currentBotResponse = data.message;  // 챗봇 응답 저장
-	addMessage("Bot", data.message, data.responseId);	// responseId 추가(피드백)
+	// addMessage("Bot", data.message, data.responseId);	// responseId 추가(피드백)
 	
 	if (data.mode == 0) {
 		md = 0;
@@ -90,7 +108,7 @@ function addMessage(sender, message, responseId = null) {
 
 	messageDiv.classList.add("msg_box");
 	messageDiv.classList.add(sender === "You" ? "send" : "receive");
-	//messageDiv.innerHTML = `<span><strong>${sender}:</strong> ${message}</span>`;
+	messageDiv.innerHTML = `<span><strong>${sender}:</strong> ${message}</span>`;
 	
 	// 챗봇 응답에 피드백 버튼 추가
     if (sender === "Bot") {
