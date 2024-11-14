@@ -11,31 +11,50 @@
   <!-- header.js 파일을 불러오기 -->
 </head>
 
-<body>
-  <div id="logout-container">
-    {% if user.is_authenticated %}
-      <div>{{ user.username }}</div>
-      <a href="{% url 'common:logout' %}">로그아웃</a>
-    {% else %}
-      <div>로그인 안되어있음</div>
-    {% endif %}
-  </div>
-
-  <div id="chat-container">
-    <h1>Hongik-gpt</h1>
-    <div id="chat-box" class="chat-content">
-      <!-- 기본 안내 메시지 -->
-      <div class="msg_box receive">
-        <span>
-          <strong>Bot:</strong>
-          안녕하세요! 홍익대학교 챗봇 Hongik-gpt입니다:)
-          <br>
-          학교에 대해 궁금한 것을 물어보세요!
-          <br>
-        </span>
-      </div>
+  <body>
+    <div id="logout-container">
+      {% if user.is_authenticated %}
+        <div>{{ user.username }}</div>
+        <a href="{% url 'common:logout' %}">로그아웃</a>
+      {% else %}
+        <div>로그인 안되어있음</div>
+      {% endif %}
     </div>
 
+    <div id="chat-container">
+      <h1>Hongik-gpt</h1>
+      <div id="chat-box" class="chat-content">
+        <!-- 기본 안내 메시지 -->
+        <div class="msg_box receive">
+          <span>
+            <strong>Bot:</strong>
+            안녕하세요! 홍익대학교 챗봇 Hongik-gpt입니다:)
+            <br>
+            학교에 대해 궁금한 것을 물어보세요!
+            <br>
+            <div id="buttons" class="buttons">
+              <div class="row">
+                <div class="button" id="0">학식</div>
+                <div class="button" id="1">편의시설</div>
+                <div class="button" id="2">연락처</div>
+              </div>
+              <div class="row">
+                <div class="button" id="3">학사일정</div>
+                <div class="button" id="4">공지사항</div>
+                <div class="button" id="5">날씨<span>☀</span></div>
+              </div>
+              <div class="row">
+                <div class="button" id="6">홍대 기본 상식</div>
+                <div class="button" id="7">졸업 요건 조회</div>
+                <div class="button" id="8">열람실 현황</div>
+              </div>
+            </div>
+
+          </span>
+        </div>
+      </div>
+
+    <div id ="close-button"></div>
     <div id="buttons" class="buttons">
       <div class="row">
         <div class="button" id="0">학식</div>
