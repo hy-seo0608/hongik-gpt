@@ -3,9 +3,24 @@ const $question = document.querySelector("#question");
 const $submitBtn = document.querySelector("#ask-button");
 const webSocket = new WebSocket("ws://" + window.location.host + "/ws/dialog");
 const $$buttons = document.querySelectorAll(".button");
+const $feedback = document.querySelector("#feedback-form");
+const modal = document.querySelector(".modal");
+const $closeButton = document.querySelector("#close-button");
+$feedback.addEventListener("submit", submitFeedback);
+
+$closeButton.addEventListener("click", (event) => {
+	const $buttonDiv = document.querySelectorAll("#buttons")[1];
+	$buttonDiv.style.display = $buttonDiv.style.display === "none" ? "" : "none";
+});
+
 let $botsChat;
 let md = 0;
 let received = true;
+let loadingDiv; // 로딩 메세지 변수
+
+// 피드백 테이블에 저장용
+let currentUserQuestion = ""; // 사용자 질문
+let currentBotResponse = ""; // 챗봇 응답
 
 const buttonQuestion = [
 	"학식을 알려줘",
@@ -34,6 +49,11 @@ webSocket.onmessage = function (event) {
 	received = true;
 	const data = JSON.parse(event.data);
 	$botsChat.querySelector("#message").innerHTML = `<strong>Bot:</strong>${data.message}`;
+
+	// 챗봇 답변 메세지
+	currentBotResponse = data.message; // 챗봇 응답 저장
+	addMessage("Bot", data.message, data.responseId); // responseId 추가(피드백)
+
 	if (data.mode == 0) {
 		md = 0;
 	} else if (data.mode == 1) {
@@ -76,9 +96,87 @@ function submitMessage(message, my_mode) {
 	addMessage("You", message);
 	addLoading();
 	webSocket.send(JSON.stringify({ message: message, mode: my_mode }));
+	currentUserQuestion = message; // 사용자가 입력한 질문 저장
 	$question.value = "";
 }
 //WebSocket methods END
+
+function addMessage(sender, message, responseId = null) {
+	const messageDiv = document.createElement("div");
+
+	messageDiv.classList.add("msg_box");
+	messageDiv.classList.add(sender === "You" ? "send" : "receive");
+	//messageDiv.innerHTML = `<span><strong>${sender}:</strong> ${message}</span>`;
+
+	// 챗봇 응답에 피드백 버튼 추가
+	if (sender === "Bot") {
+		const feedbackButton = addFeedbackButton(responseId);
+		feedbackButton.classList.add("feedback-button");
+		messageDiv.appendChild(feedbackButton);
+	}
+
+	$chatBox.appendChild(messageDiv);
+	$chatBox.scrollTop = $chatBox.scrollHeight;
+}
+
+// 피드백 서버로 전달
+function submitFeedback(event) {
+	event.preventDefault();
+	const feedbackText = document.getElementById("feedback-text").value;
+	const responseId = document.getElementById("feedback-form").dataset.responseId; // 모달에 저장된 responseId 가져오기
+
+	// 디버그 출력
+	console.log("user_question:", currentUserQuestion);
+	console.log("model_answer:", currentBotResponse);
+
+	fetch("dialog/feedback/", {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+			"X-CSRFToken": getCookie("csrftoken"), // CSRF 토큰 추가
+		},
+		body: JSON.stringify({
+			user_desired_answer: feedbackText, // 사용자가 입력한 피드백
+			responseId: responseId, // 서버로 responseId 전달
+			user_question: currentUserQuestion, // 사용자 질문
+			model_answer: currentBotResponse, // 챗봇 응답
+		}),
+	})
+		.then((response) => response.json())
+		.then((data) => {
+			if (data.message === "피드백을 주셔서 감사합니다!") {
+				alert(data.message); // 피드백 성공 메시지 표시
+				closeFeedbackModal(); // 모달 창 닫기
+			} else {
+				alert("피드백 전송에 실패했습니다.");
+			}
+		})
+		.catch((error) => {
+			console.error("Error submitting feedback:", error);
+		});
+}
+
+// 모달 창 열기 함수
+function openFeedbackModal(responseId) {
+	document.getElementById("feedback-modal").style.display = "block";
+	modal.dataset.responseId = responseId; // responseId 저장
+}
+
+// 모달 창 닫기 함수
+function closeFeedbackModal() {
+	document.getElementById("feedback-modal").style.display = "none";
+	document.getElementById("feedback-text").value = ""; // 피드백 내용 초기화
+}
+
+function addFeedbackButton(responseId) {
+	const feedbackButton = document.createElement("button");
+	feedbackButton.className = "feedback-button";
+	feedbackButton.textContent = "피드백";
+	feedbackButton.onclick = function () {
+		openFeedbackModal(responseId);
+	};
+	return feedbackButton;
+}
 
 function addLoading() {
 	const loadingDiv = document.createElement("div");
@@ -102,19 +200,16 @@ function addMessage(sender, message) {
 
 function addButton(button_list, mode) {
 	const buttonDiv = document.createElement("div");
-
 	button_list.forEach((element) => {
 		const button = document.createElement("button");
-
 		button.textContent = element;
 		button.onclick = function () {
 			handleButtonClick(element, mode);
-			console.log(element, mode);
 		};
 		buttonDiv.appendChild(button);
-		$chatBox.appendChild(buttonDiv);
-		$chatBox.scrollTop = $chatBox.scrollHeight;
 	});
+	$chatBox.appendChild(buttonDiv);
+	$chatBox.scrollTop = $chatBox.scrollHeight;
 }
 
 // 사용자가 특정 옵션 버튼을 클릭한 경우
