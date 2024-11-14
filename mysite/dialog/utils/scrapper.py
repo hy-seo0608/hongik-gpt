@@ -1,5 +1,7 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support import expected_conditions as EC
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -28,41 +30,38 @@ class Scrapper:
         return cls._instance
 
     def get_food_list(self):
-        dormitory_url = "https://www.hongik.ac.kr/kr/life/seoul-cafeteria-view.do?articleNo=5414&restNo=2"
-        staff_url = "https://www.hongik.ac.kr/kr/life/seoul-cafeteria-view.do?articleNo=5413&restNo=3"
+        today_url = "https://apps.hongik.ac.kr/food/food_m.php?p=1"
+        tomorrow_url = "https://apps.hongik.ac.kr/food/food_m.php?p=2"
 
-        def get_data_list(url):
-            BaseException
+        def get_data_list(url) : 
             self.browser.get(url)
-            WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "b-cafeteria-diet-list")))
+            self.browser.implicitly_wait(10)
             soup = BeautifulSoup(self.browser.page_source, "html.parser")
-            day_lists = soup.find("div", "b-cafeteria-diet-list").find_all("div", recursive=False)
-            data_list = []
 
-            for day in day_lists:
-                diet_list = day.find("div").find_all("div", recursive=False)
-                date = day.find("p").text
+            
+            head = soup.find("table").thead
+            date = re.findall(r'\((.*?)\)',head.find("div",class_="date").text)[0]
+            print(date)
+            table = soup.find("table").tbody
+            flag=0
+            domi, staff = [], []
+            for content in table.find_all("tr"):
+                td = content.find_all("td", "time")
+                if td:
+                    flag += 1
+                    continue
+                if flag ==1 :
+                    staff.append({"date" : date, "time" : content.th.text[:2], "menu" : content.td.text.strip().split("\n")})
+                else :
+                    domi.append({"date" : date, "time" : content.th.text[:2], "menu" : content.td.text.strip().split("\n")})
 
-                for diet in diet_list:
-                    data = OrderedDict()
-                    data["date"] = date
-                    time = diet.find("p").text
-                    data["time"] = time
-                    data["menu"] = []
-                    menu_list = diet.find_all("li")
-
-                    for menu in menu_list:
-                        if not menu.text.rstrip():
-                            continue
-                        data["menu"].append(menu.text.rstrip())
-
-                    data_list.append(data)
-            print(data_list)
-            return data_list
-
+            return staff, domi
+        
         menu_list = OrderedDict()
-        menu_list["dormitory"] = get_data_list(dormitory_url)
-        menu_list["staff"] = get_data_list(staff_url)
+        today_staff, today_domi = get_data_list(today_url)
+        tomorrow_staff, tomorrow_domi = get_data_list(tomorrow_url)
+        menu_list["staff"] = today_staff + tomorrow_staff
+        menu_list["dormitory"] = today_domi + tomorrow_domi
 
         with open("food_list.json", "w") as f:
             json.dump(menu_list, f, ensure_ascii=False, indent="\t")
@@ -105,7 +104,7 @@ class Scrapper:
             base_url = base_url + f"?mode=list&srSearchKey=onename&srSearchVal={search_query}"
 
         self.browser.get(base_url)
-        self.browser.implicitly_wait(10)
+        WebDriverWait(self.browser, 30).until(EC.presence_of_element_located((By.CLASS_NAME, "bn-list-card")))
         soup = BeautifulSoup(self.browser.page_source, "html.parser")
         try:
             if mode == 1:
@@ -197,13 +196,14 @@ class Scrapper:
 
 if __name__ == "__main__":
     a = Scrapper()
-    print(a.options.arguments)
-    print(a.get_food_list())
-    print(a.get_notice())
-    d1 = a.get_phone_number("요건없을걸", 0)
-    d2 = a.get_phone_number("배성일", 1)
-    print(d1)
-    print(d2)
-    a.get_studyroom_status(0)
-    a.get_studyroom_status(1)
-    a.get_studyroom_status(2)
+    dormitory_url = "https://www.hongik.ac.kr/kr/life/seoul-cafeteria-view.do?articleNo=5414&restNo=2"
+    staff_url = "https://www.hongik.ac.kr/kr/life/seoul-cafeteria-view.do?articleNo=5413&restNo=3"
+    a.get_food_list()
+    # print(a.get_notice())
+    # d1 = a.get_phone_number("요건없을걸", 0)
+    # d2 = a.get_phone_number("배성일", 1)
+    # print(d1)
+    # print(d2)
+    # a.get_studyroom_status(0)
+    # a.get_studyroom_status(1)
+    # a.get_studyroom_status(2)

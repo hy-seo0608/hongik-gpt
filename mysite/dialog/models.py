@@ -1,31 +1,19 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 import datetime
 from django.utils import timezone
 
-"""
-모델의 활성화를 위해서는 
-1. 데이터베이스 스키마 생성
-2. 객체에 접근하기 위한 Python 데이터베이스 접근 API를 생성
-"""
 
-
-# Create your models here.
-class Question(models.Model):
-    question_text = models.CharField(max_length=500)
-    pub_date = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.question_text
-
-    def was_published_recently(self):
-        return self.pub_date >= timezone.now() - datetime.timedelta(days=1)
-
-
-class Answer(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    answer_text = models.TextField()
-    create_date = models.DateTimeField(auto_now_add=True)
+# 사용자 피드백을 받기 위한 db 테이블
+class Feedback(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_question = models.TextField()                          # 사용자가 한 질문
+    model_classification = models.CharField(max_length=255)     # 대분류, 질문 클래스
+    model_answer = models.TextField()                           # 모델이 출력한 답변
+    user_intended_classification = models.CharField(max_length=255, blank=True, null=True) # 사용자가 원한 질문 분류 (대분류, 질문 클래스)
+    user_desired_answer = models.TextField(blank=True, null=True)   # 사용자가 원한 답변 (사용자가 입력)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.answer_text
+        return f"Feedback from {self.user.username} on {self.created_at}"

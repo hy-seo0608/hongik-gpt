@@ -11,7 +11,7 @@ from weather import get_weather
 # Scrapper 클래스 인스턴스 생성
 scraper = Scrapper()
 
-renewfile_path = './mysite/dataset/renew.xlsx'
+renewfile_path = '../../dataset/renew.xlsx'
 # 요일을 한국어로 매핑하는 딕셔너리
 weekdays_korean = {
     'Monday': '월',
@@ -75,11 +75,22 @@ def update_food_list(excel_file_path):
     # 리스트를 문자열로 변환하여 엑셀에 저장
     sheet['B2'] = ', '.join(dormitory_df.iloc[0]["menu"])
     sheet['B3'] = ', '.join(dormitory_df.iloc[1]["menu"])
-    sheet['B4'] = ', '.join(dormitory_df.iloc[2]["menu"])
+    sheet['B28'] = ', '.join(dormitory_df.iloc[2]["menu"])
+    sheet['B4'] = ', '.join(dormitory_df.iloc[3]["menu"])
 
-    sheet['B5'] = ', '.join(staff_df.iloc[0]["menu"])
-    sheet['B6'] = ', '.join(staff_df.iloc[1]["menu"])
-    sheet['B7'] = ', '.join(staff_df.iloc[2]["menu"])
+    sheet['B5'] = '학식 정보 없음'
+    sheet['B6'] = ', '.join(staff_df.iloc[0]["menu"])
+    sheet['B7'] = ', '.join(staff_df.iloc[1]["menu"])
+
+    # 다음날
+    sheet['B29'] = ', '.join(dormitory_df.iloc[4]["menu"])
+    sheet['B30'] = ', '.join(dormitory_df.iloc[5]["menu"])
+    sheet['B31'] = ', '.join(dormitory_df.iloc[6]["menu"])
+    sheet['B32'] = ', '.join(dormitory_df.iloc[7]["menu"])
+
+    sheet['B33'] = '학식 정보 없음'
+    sheet['B34'] = ', '.join(staff_df.iloc[2]["menu"])
+    sheet['B35'] = ', '.join(staff_df.iloc[3]["menu"])
 
     workbook.save(renewfile_path)
     

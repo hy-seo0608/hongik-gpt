@@ -49,10 +49,14 @@ webSocket.onmessage = function (event) {
 	received = true;
 	const data = JSON.parse(event.data);
 	$botsChat.querySelector("#message").innerHTML = `<strong>Bot:</strong>${data.message}`;
+	// 챗봇 응답에 피드백 버튼 추가
+	const feedbackButton = addFeedbackButton(data.responseId);
+	feedbackButton.classList.add("feedback-button");
+	$botsChat.appendChild(feedbackButton);
 
 	// 챗봇 답변 메세지
 	currentBotResponse = data.message; // 챗봇 응답 저장
-	addMessage("Bot", data.message, data.responseId); // responseId 추가(피드백)
+	// addMessage("Bot", data.message, data.responseId);	// responseId 추가(피드백)
 
 	if (data.mode == 0) {
 		md = 0;
@@ -99,6 +103,7 @@ function submitMessage(message, my_mode) {
 	currentUserQuestion = message; // 사용자가 입력한 질문 저장
 	$question.value = "";
 }
+
 //WebSocket methods END
 
 function addMessage(sender, message, responseId = null) {
@@ -106,7 +111,7 @@ function addMessage(sender, message, responseId = null) {
 
 	messageDiv.classList.add("msg_box");
 	messageDiv.classList.add(sender === "You" ? "send" : "receive");
-	//messageDiv.innerHTML = `<span><strong>${sender}:</strong> ${message}</span>`;
+	messageDiv.innerHTML = `<span><strong>${sender}:</strong> ${message}</span>`;
 
 	// 챗봇 응답에 피드백 버튼 추가
 	if (sender === "Bot") {
@@ -186,16 +191,6 @@ function addLoading() {
 	$chatBox.appendChild(loadingDiv);
 	$chatBox.scrollTop = $chatBox.scrollHeight;
 	$botsChat = loadingDiv;
-}
-
-function addMessage(sender, message) {
-	const messageDiv = document.createElement("div");
-
-	messageDiv.classList.add("msg_box");
-	messageDiv.classList.add(sender === "You" ? "send" : "receive");
-	messageDiv.innerHTML = `<span><strong>${sender}:</strong> ${message}</span>`;
-	$chatBox.appendChild(messageDiv);
-	$chatBox.scrollTop = $chatBox.scrollHeight;
 }
 
 function addButton(button_list, mode) {
