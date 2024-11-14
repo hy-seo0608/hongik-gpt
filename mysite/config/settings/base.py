@@ -46,6 +46,7 @@ SITE_ID = 1
 # Application definition
 
 INSTALLED_APPS = [
+    # "pybo.apps.PyboConfig",
     "common.apps.CommonConfig",
     "dialog.apps.DialogConfig",
     "corsheaders",
