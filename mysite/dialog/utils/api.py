@@ -58,4 +58,4 @@ def fetch_and_save_json(api_url, output_file="output.json", headers=None):
 custom_headers = {"ID": 0}
 fetch_and_save_json("https://napi.hongik.ac.kr/homepage/get_food_list.php", "food_data.json")
 fetch_and_save_json("https://napi.hongik.ac.kr//schedule/get_schedule.php", "schedule_data.json")
-fetch_and_save_json("https://napi.hongik.ac.kr/homepage/cnet_notice.php", "notice_data.json", custom_headers)
+# fetch_and_save_json("https://napi.hongik.ac.kr/homepage/cnet_notice.php", "notice_data.json", custom_headers)
