@@ -12,11 +12,11 @@ import matplotlib.pyplot as plt
 import csv
 from numpy.linalg import norm
 from numpy import dot
-from ..apps import DialogConfig
+# from ..apps import DialogConfig
 
 
 model = SentenceTransformer("snunlp/KR-SBERT-V40K-klueNLI-augSTS")
-df = pd.read_excel("dataset/answerfile_template.xlsx")
+df = pd.read_excel("../../dataset/answerfile_template.xlsx")
 sentences = [df.iloc[i, 1] for i in range(len(df))]
 embedding_vectors = [model.encode(sentence) for sentence in sentences]
 
@@ -27,7 +27,26 @@ def predict(sentence):
 
     cos_sim = util.cos_sim(encoded_sentence, embedding_vectors)
 
+    cos_max = torch.max(cos_sim, dim=1)  # torch.max 사용
     best_sim_idx = int(np.argmax(cos_sim))
     pred_sentence = df.iloc[best_sim_idx, 1]
 
-    return best_sim_idx, pred_sentence
+    return best_sim_idx, pred_sentence, cos_max[0].item() 
+
+# 메인 실행
+if __name__ == '__main__':
+    output_file = "predictions.txt"  # 결과를 저장할 텍스트 파일
+    with open(output_file, "a", encoding="utf-8") as file:  # 파일을 열기 (append 모드)
+        while True:
+            s = input("입력: ")
+            if s.lower() == "exit":  # 종료 조건
+                print("프로그램 종료.")
+                break
+
+            idx, sen, cos = predict(s)
+            print(f"Index: {idx}, Sentence: {sen}, Cosine Similarity: {cos:.4f}")
+
+            # 결과를 텍스트 파일에 저장
+            file.write(f"Input: {s}\t")
+            file.write(f"Index: {idx}, Sentence: {sen}, Cosine Similarity: {cos:.4f}\t\n")
+            file.write("-" * 50 + "\n")  # 구분선 추가
