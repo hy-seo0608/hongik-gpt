@@ -1,11 +1,16 @@
 import pandas as pd
 import os
+import schedule
 
-answer_file_path = "dataset/answerfile.xlsx"
+
+answer_file_path = "/dataset/answerfile.xlsx"
+renew_file_path = "../../dataset/answerfile.xlsx"
 df = pd.read_excel(answer_file_path)
 
-print(df.iloc[170])
-print(df.columns)
+def renew_df() :
+    global df
+    df = pd.read_excel(renew_file_path)
+    print(df.iloc[0]['답변'])
 
 def FindAnswer(idx):
     if pd.isna(df.iloc[idx]['버튼']) : 

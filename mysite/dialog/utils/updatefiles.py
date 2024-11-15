@@ -2,6 +2,7 @@ import schedule
 import time
 import updatefile
 import renew
+from FindAnswer import renew_df
 
 renewfile_path = '../../dataset/renew.xlsx'
 std_excel_file_path = '../../dataset/answerfile_template.xlsx'         # 원본 엑셀 파일 경로
@@ -27,6 +28,7 @@ def run_renew():
 # 1분마다 실행 테스트
 schedule.every(1).minutes.do(run_updatefile)
 schedule.every(1).minutes.do(run_renew)
+schedule.every(1).minutes.do(renew_df)
 
 # 스케줄을 계속 실행시키기 위한 루프
 while True:
