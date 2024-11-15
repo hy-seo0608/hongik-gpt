@@ -7,6 +7,7 @@ from collections import OrderedDict
 import requests
 import openpyxl
 from weather import get_weather
+from api import fetch_and_save_json
 
 # Scrapper 클래스 인스턴스 생성
 scraper = Scrapper()
@@ -60,37 +61,50 @@ def update_food_list(excel_file_path):
     # 엑셀 파일 불러오기
     workbook = openpyxl.load_workbook(excel_file_path)
     sheet = workbook.active  # 활성화된 시트 선택
+    
+    food_url = "https://napi.hongik.ac.kr/homepage/get_food_list.php"
+    fetch_and_save_json(food_url, "food_data.json")
 
-    scraper.get_food_list()
-    # food_df = pd.read_json('food_list.json')
     # JSON 파일 로드
-    with open('food_list.json', 'r', encoding='utf-8') as f:
+    with open('food_data.json', 'r', encoding='utf-8') as f:
         data = json.load(f)
     # 각 섹션을 개별 데이터프레임으로 변환
-    dormitory_df = pd.DataFrame(data['dormitory'])
-    # print(dormitory_df)
-    staff_df = pd.DataFrame(data['staff'])
-    # print(staff_df)
-    
-    # 리스트를 문자열로 변환하여 엑셀에 저장
-    sheet['B2'] = ', '.join(dormitory_df.iloc[0]["menu"])
-    sheet['B3'] = ', '.join(dormitory_df.iloc[1]["menu"])
-    sheet['B28'] = ', '.join(dormitory_df.iloc[2]["menu"])
-    sheet['B4'] = ', '.join(dormitory_df.iloc[3]["menu"])
+    df = pd.DataFrame(data['DATA']['RESTDATA'])
 
-    sheet['B5'] = '학식 정보 없음'
-    sheet['B6'] = ', '.join(staff_df.iloc[0]["menu"])
-    sheet['B7'] = ', '.join(staff_df.iloc[1]["menu"])
+    def find_menu(menu_date, rest_no, price_level):
+        # 조건 필터링
+        filtered = df[(df['MENU_DATE'] == menu_date) & 
+                    (df['REST_NO'] == rest_no) & 
+                    (df['PRICELEVEL'] == price_level)]
+        if not filtered.empty:
+            lst = list(filtered.iloc[0]['MENU'].split('\r\n'))
+            return ', '.join(lst)  # 첫 번째 결과 반환
+        else:
+            return "메뉴를 찾을 수 없습니다. "
+  
+    today_date = datetime.datetime.now().strftime('%Y%m%d')
+    tomorrow_date = (datetime.datetime.now() + datetime.timedelta(days=1)).strftime('%Y%m%d')
+    staff_no, domi_no = '2', '3'
+    # 리스트를 문자열로 변환하여 엑셀에 저장
+    # 아침 : 0 점심 : 1 점심A : 2 저녁 : 3
+    sheet['B2'] = find_menu(today_date, domi_no, '0')
+    sheet['B3'] = find_menu(today_date, domi_no, '1')
+    sheet['B28'] = find_menu(today_date, domi_no, '2')
+    sheet['B4'] = find_menu(today_date, domi_no, '3')
+
+    sheet['B5'] = find_menu(today_date, staff_no, '3')
+    sheet['B6'] = find_menu(today_date, staff_no, '0')
+    sheet['B7'] = find_menu(today_date, staff_no, '1')
 
     # 다음날
-    sheet['B29'] = ', '.join(dormitory_df.iloc[4]["menu"])
-    sheet['B30'] = ', '.join(dormitory_df.iloc[5]["menu"])
-    sheet['B31'] = ', '.join(dormitory_df.iloc[6]["menu"])
-    sheet['B32'] = ', '.join(dormitory_df.iloc[7]["menu"])
+    sheet['B29'] = find_menu(tomorrow_date, domi_no, '0')
+    sheet['B30'] = find_menu(tomorrow_date, domi_no, '1')
+    sheet['B31'] = find_menu(tomorrow_date, domi_no, '2')
+    sheet['B32'] = find_menu(tomorrow_date, domi_no, '3')
 
-    sheet['B33'] = '학식 정보 없음'
-    sheet['B34'] = ', '.join(staff_df.iloc[2]["menu"])
-    sheet['B35'] = ', '.join(staff_df.iloc[3]["menu"])
+    sheet['B33'] = find_menu(tomorrow_date, staff_no, '3')
+    sheet['B34'] = find_menu(tomorrow_date, staff_no, '0')
+    sheet['B35'] = find_menu(tomorrow_date, staff_no, '1')
 
     workbook.save(renewfile_path)
     
@@ -116,10 +130,10 @@ def update_notice(excel_file_path):
     notice_df = pd.DataFrame(unique_notices)
     ret_notice = ""
     for i in range(min(5, len(notice_df))) : 
-        ret_notice += f"제목 : {notice_df.iloc[i]['subject']}\n"
-        ret_notice += f"링크 : {notice_df.iloc[i]['link']}\n"
-        ret_notice += f"작성자 : {notice_df.iloc[i]['name']}\n"
-        ret_notice += f"작성일자 : {notice_df.iloc[i]['date']}\n\n"
+        ret_notice += f"제목 : {notice_df.iloc[i]['subject']}<br>"
+        ret_notice += f"링크 : {notice_df.iloc[i]['link']}<br>"
+        ret_notice += f"작성자 : {notice_df.iloc[i]['name']}<br>"
+        ret_notice += f"작성일자 : {notice_df.iloc[i]['date']}<br><br>"
     # 엑셀 파일 불러오기
     workbook = openpyxl.load_workbook(excel_file_path)
     sheet = workbook.active  # 활성화된 시트 선택

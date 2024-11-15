@@ -7,6 +7,7 @@ from .apps import DialogConfig
 import time
 import numpy as np
 
+THRESHOLD = 0.6
 
 # HTML 테이블 생성 함수
 def generate_html_table(data):
@@ -40,9 +41,13 @@ class DialogConsumer(AsyncJsonWebsocketConsumer):
         message = text_data_json["message"]
         mode = int(text_data_json["mode"])
 
-        pred, pred_sentence = predict(message)
-        print(message, pred_sentence, mode)
+        pred, pred_sentence, cos_sim = predict(message)
+        print(message, pred_sentence, mode, cos_sim)
 
+        if mode == 0 and cos_sim < THRESHOLD :
+            await  self.send(text_data=json.dumps({"message": "무슨 말인지 모르겠어요", "mode": 0, "button": []}))
+            return 
+        
         if mode == 0:  # 답변 주고 끝
             return_message, button_lst, mode = FindAnswer(pred)
         elif mode == 1:
