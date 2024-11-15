@@ -15,8 +15,9 @@ from numpy import dot
 # from ..apps import DialogConfig
 
 
+source = "./dataset/answerfile_template.xlsx"
 model = SentenceTransformer("snunlp/KR-SBERT-V40K-klueNLI-augSTS")
-df = pd.read_excel("../../dataset/answerfile_template.xlsx")
+df = pd.read_excel(source)
 sentences = [df.iloc[i, 1] for i in range(len(df))]
 embedding_vectors = [model.encode(sentence) for sentence in sentences]
 
@@ -27,11 +28,12 @@ def predict(sentence):
 
     cos_sim = util.cos_sim(encoded_sentence, embedding_vectors)
 
-    cos_max = torch.max(cos_sim, dim=1)  # torch.max 사용
+    
     best_sim_idx = int(np.argmax(cos_sim))
+    cos_max = cos_sim[0, best_sim_idx].item()    # 최댓값을 float로 변환
     pred_sentence = df.iloc[best_sim_idx, 1]
 
-    return best_sim_idx, pred_sentence, cos_max[0].item() 
+    return best_sim_idx, pred_sentence, float(cos_max)
 
 # 메인 실행
 if __name__ == '__main__':
