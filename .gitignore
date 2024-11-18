@@ -1,0 +1,9 @@
+mysite/.env
+mystie/.env.db
+*.pyc
+__pycahce__/
+.DS_Store
+mysite/nohup.out
+.idea
+db.sqlite3
+*.json

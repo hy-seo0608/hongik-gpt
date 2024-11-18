@@ -1,0 +1,4 @@
+mysite/.env
+*.pyc
+__pycahce__/
+.DS_Store
