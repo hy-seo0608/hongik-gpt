@@ -3,6 +3,7 @@ import urllib.parse
 import base64
 import json
 
+
 def decode_url_values(data):
     """
     JSON 데이터의 모든 URL 인코딩된 문자열 값을 디코딩하는 함수
@@ -55,7 +56,8 @@ def fetch_and_save_json(api_url, output_file="output.json", headers=None):
 
 
 # 예제 호출
-custom_headers = {"ID": 0}
-fetch_and_save_json("https://napi.hongik.ac.kr/homepage/get_food_list.php", "food_data.json")
-fetch_and_save_json("https://napi.hongik.ac.kr//schedule/get_schedule.php", "schedule_data.json")
-# fetch_and_save_json("https://napi.hongik.ac.kr/homepage/cnet_notice.php", "notice_data.json", custom_headers)
+if __name__ == "__main__":
+    custom_headers = {"ID": 0}
+    fetch_and_save_json("https://napi.hongik.ac.kr/homepage/get_food_list.php", "food_data.json")
+    fetch_and_save_json("https://napi.hongik.ac.kr//schedule/get_schedule.php", "schedule_data.json")
+    # fetch_and_save_json("https://napi.hongik.ac.kr/homepage/cnet_notice.php", "notice_data.json", custom_headers)

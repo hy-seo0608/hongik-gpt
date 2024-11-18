@@ -12,12 +12,17 @@ import matplotlib.pyplot as plt
 import csv
 from numpy.linalg import norm
 from numpy import dot
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from configure import ANSWER_FILE_PATH
+
 # from ..apps import DialogConfig
 
 
-source = "./dataset/answerfile_template.xlsx"
 model = SentenceTransformer("snunlp/KR-SBERT-V40K-klueNLI-augSTS")
-df = pd.read_excel(source)
+df = pd.read_excel(ANSWER_FILE_PATH)
 sentences = [df.iloc[i, 1] for i in range(len(df))]
 embedding_vectors = [model.encode(sentence) for sentence in sentences]
 
@@ -28,15 +33,15 @@ def predict(sentence):
 
     cos_sim = util.cos_sim(encoded_sentence, embedding_vectors)
 
-    
     best_sim_idx = int(np.argmax(cos_sim))
-    cos_max = cos_sim[0, best_sim_idx].item()    # 최댓값을 float로 변환
+    cos_max = cos_sim[0, best_sim_idx].item()  # 최댓값을 float로 변환
     pred_sentence = df.iloc[best_sim_idx, 1]
 
     return best_sim_idx, pred_sentence, float(cos_max)
 
+
 # 메인 실행
-if __name__ == '__main__':
+if __name__ == "__main__":
     output_file = "predictions.txt"  # 결과를 저장할 텍스트 파일
     with open(output_file, "a", encoding="utf-8") as file:  # 파일을 열기 (append 모드)
         while True:

@@ -12,6 +12,21 @@ import json
 from collections import OrderedDict
 import re
 
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from configure import (
+    NOTICE_URL,
+    NOTICE_ADD_URL,
+    NOTICE_FILE_PATH,
+    PHONE_NUMBER_OFFICE_URL,
+    PHONE_NUMBER_PERSON_URL,
+    PHONE_NUMBER_FILE_PATH,
+    STUDYROOM_URL,
+)
+
 
 class Scrapper:
     _instance = None
@@ -29,48 +44,9 @@ class Scrapper:
             cls._instance = super(Scrapper, cls).__new__(cls)
         return cls._instance
 
-    def get_food_list(self):
-        today_url = "https://apps.hongik.ac.kr/food/food_m.php?p=1"
-        tomorrow_url = "https://apps.hongik.ac.kr/food/food_m.php?p=2"
-
-        def get_data_list(url) : 
-            self.browser.get(url)
-            self.browser.implicitly_wait(10)
-            soup = BeautifulSoup(self.browser.page_source, "html.parser")
-
-            
-            head = soup.find("table").thead
-            date = re.findall(r'\((.*?)\)',head.find("div",class_="date").text)[0]
-            print(date)
-            table = soup.find("table").tbody
-            flag=0
-            domi, staff = [], []
-            for content in table.find_all("tr"):
-                td = content.find_all("td", "time")
-                if td:
-                    flag += 1
-                    continue
-                if flag ==1 :
-                    staff.append({"date" : date, "time" : content.th.text[:2], "menu" : content.td.text.strip().split("\n")})
-                else :
-                    domi.append({"date" : date, "time" : content.th.text[:2], "menu" : content.td.text.strip().split("\n")})
-
-            return staff, domi
-        
-        menu_list = OrderedDict()
-        today_staff, today_domi = get_data_list(today_url)
-        tomorrow_staff, tomorrow_domi = get_data_list(tomorrow_url)
-        menu_list["staff"] = today_staff + tomorrow_staff
-        menu_list["dormitory"] = today_domi + tomorrow_domi
-
-        with open("food_list.json", "w") as f:
-            json.dump(menu_list, f, ensure_ascii=False, indent="\t")
-
     def get_notice(self):
-        base_url = "https://ko.hongik.ac.kr/front/boardlist.do?bbsConfigFK=54&siteGubun=1&menuGubun=1"
-        add_url = "https://ko.hongik.ac.kr/"
 
-        self.browser.get(base_url)
+        self.browser.get(NOTICE_URL)
         self.browser.implicitly_wait(10)
         soup = BeautifulSoup(self.browser.page_source, "html.parser")
 
@@ -83,20 +59,18 @@ class Scrapper:
             data["subject"] = td_list[1].find("span").text
             link = td_list[1].a["href"]
             link = sub.findall(link)[0][:-1]
-            data["link"] = f"https://wwwce.hongik.ac.kr/dept/0401.html?{link}"
+            data["link"] = f"{NOTICE_ADD_URL}{link}"
             data["name"] = td_list[2].text
             data["date"] = td_list[4].text
             data_list.append(data)
 
-        with open("notice_list.json", "w") as f:
+        with open(NOTICE_FILE_PATH, "w") as f:
             json.dump(data_list, f, ensure_ascii=False, indent="\t")
 
     def get_phone_number(self, search_query, mode):
         ##mode 0 : office , 1 : person
-        base_url_person = "https://www.hongik.ac.kr/kr/introduction/search-for-faculty.do"
-        base_url_office = "https://www.hongik.ac.kr/kr/introduction/search-phone.do"
 
-        base_url = base_url_office if mode == 0 else base_url_person
+        base_url = PHONE_NUMBER_OFFICE_URL if mode == 0 else PHONE_NUMBER_PERSON_URL
 
         if mode == 0:
             base_url = base_url + f"?mode=list&srSearchKey=name&srSearchVal={search_query}"
@@ -115,9 +89,6 @@ class Scrapper:
                 data["spot"] = query_result.find("p", "b-spot").text
                 data["phone_num"] = query_result.find("a", {"title": "전화걸기"}).text.strip()
 
-                with open("phone_number.json", "w") as f:
-                    json.dump(data, f, ensure_ascii=False, indent="\t")
-                return data
             else:
                 data_list = []
                 query_result = soup.find("div", "bn-list-card phone-search")
@@ -128,9 +99,9 @@ class Scrapper:
                     data["phone_num"] = phone_num.text if phone_num is not None else "there is no phone number"
                     data_list.append(data)
 
-                with open("phone_number.json", "w") as f:
-                    json.dump(data_list, f, ensure_ascii=False, indent="\t")
-                return data
+            with open(PHONE_NUMBER_FILE_PATH, "w") as f:
+                json.dump(data_list, f, ensure_ascii=False, indent="\t")
+            return data
         except:
             return {}
 
@@ -142,13 +113,12 @@ class Scrapper:
         R_studyroom_url = 'http://223.194.83.66/'
         """
 
-        url = ["http://203.249.67.222/", "http://203.249.65.81/", "http://223.194.83.66/"]
         url_to_studyroom_num = {
-            url[0]: 4,
-            url[1]: 4,
-            url[2]: 1,
+            STUDYROOM_URL[0]: 4,
+            STUDYROOM_URL[1]: 4,
+            STUDYROOM_URL[2]: 1,
         }
-        base_url = url[mode]
+        base_url = STUDYROOM_URL[mode]
         self.browser.get(base_url)
         self.browser.implicitly_wait(10)
         soup = BeautifulSoup(self.browser.page_source, "html.parser")
