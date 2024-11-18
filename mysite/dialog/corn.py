@@ -1,11 +1,11 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 import schedule
 import time
-from .utils import updatefile
-from .utils import renew
-from .utils import FindAnswer
+from utils import updatefile
+from utils import renew
+from utils import FindAnswer
 import os
-from ..configure import ANSWER_FILE_PATH, ANSWER_TEMPLATE_FILE_PATH, RENEW_FILE_PATH
+from configure import ANSWER_FILE_PATH, ANSWER_TEMPLATE_FILE_PATH, RENEW_FILE_PATH
 
 
 def job():
@@ -30,5 +30,5 @@ def run_renew():
 
 def main():
     sched = BackgroundScheduler()
-    sched.add_job(job, "interval", minutes=1, id="test")
+    sched.add_job(job, "interval", hours=2, id="test")
     sched.start()

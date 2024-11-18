@@ -8,8 +8,12 @@ import requests
 import openpyxl
 import os
 from .weather import get_weather
-from utils.api import fetch_and_save_json
-from mysite.configure import RENEW_FILE_PATH, FOOD_LIST_FILE_PATH, API_FOOD_URL, NOTICE_FILE_PATH
+from .api import fetch_and_save_json
+
+import sys
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from configure import RENEW_FILE_PATH, FOOD_LIST_FILE_PATH, API_FOOD_URL, NOTICE_FILE_PATH
 
 # Scrapper 클래스 인스턴스 생성
 scraper = Scrapper()
@@ -52,41 +56,49 @@ def update_date(excel_file_path):
 
 # 학식 정보 크롤링 및 엑셀 파일 업데이트
 def update_food_list(excel_file_path):
-    # 엑셀 파일 불러오기
     workbook = openpyxl.load_workbook(excel_file_path)
     sheet = workbook.active  # 활성화된 시트 선택
 
-    food_url = API_FOOD_URL
-    fetch_and_save_json(food_url, FOOD_LIST_FILE_PATH)
+    fetch_and_save_json(API_FOOD_URL, FOOD_LIST_FILE_PATH)
 
     # JSON 파일 로드
     with open(FOOD_LIST_FILE_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
     # 각 섹션을 개별 데이터프레임으로 변환
-    dormitory_df = pd.DataFrame(data["dormitory"])
-    # print(dormitory_df)
-    staff_df = pd.DataFrame(data["staff"])
-    # print(staff_df)
+    df = pd.DataFrame(data["DATA"]["RESTDATA"])
 
+    def find_menu(menu_date, rest_no, price_level):
+        # 조건 필터링
+        filtered = df[(df["MENU_DATE"] == menu_date) & (df["REST_NO"] == rest_no) & (df["PRICELEVEL"] == price_level)]
+        if not filtered.empty:
+            lst = list(filtered.iloc[0]["MENU"].split("\r\n"))
+            return ", ".join(lst)  # 첫 번째 결과 반환
+        else:
+            return "메뉴를 찾을 수 없습니다. "
+
+    today_date = datetime.datetime.now().strftime("%Y%m%d")
+    tomorrow_date = (datetime.datetime.now() + datetime.timedelta(days=1)).strftime("%Y%m%d")
+    staff_no, domi_no = "2", "3"
     # 리스트를 문자열로 변환하여 엑셀에 저장
-    sheet["B2"] = ", ".join(dormitory_df.iloc[0]["menu"])
-    sheet["B3"] = ", ".join(dormitory_df.iloc[1]["menu"])
-    sheet["B28"] = ", ".join(dormitory_df.iloc[2]["menu"])
-    sheet["B4"] = ", ".join(dormitory_df.iloc[3]["menu"])
+    # 아침 : 0 점심 : 1 점심A : 2 저녁 : 3
+    sheet["B2"] = find_menu(today_date, domi_no, "0")
+    sheet["B3"] = find_menu(today_date, domi_no, "1")
+    sheet["B28"] = find_menu(today_date, domi_no, "2")
+    sheet["B4"] = find_menu(today_date, domi_no, "3")
 
-    sheet["B5"] = "학식 정보 없음"
-    sheet["B6"] = ", ".join(staff_df.iloc[0]["menu"])
-    sheet["B7"] = ", ".join(staff_df.iloc[1]["menu"])
+    sheet["B5"] = find_menu(today_date, staff_no, "3")
+    sheet["B6"] = find_menu(today_date, staff_no, "0")
+    sheet["B7"] = find_menu(today_date, staff_no, "1")
 
     # 다음날
-    sheet["B29"] = ", ".join(dormitory_df.iloc[4]["menu"])
-    sheet["B30"] = ", ".join(dormitory_df.iloc[5]["menu"])
-    sheet["B31"] = ", ".join(dormitory_df.iloc[6]["menu"])
-    sheet["B32"] = ", ".join(dormitory_df.iloc[7]["menu"])
+    sheet["B29"] = find_menu(tomorrow_date, domi_no, "0")
+    sheet["B30"] = find_menu(tomorrow_date, domi_no, "1")
+    sheet["B31"] = find_menu(tomorrow_date, domi_no, "2")
+    sheet["B32"] = find_menu(tomorrow_date, domi_no, "3")
 
-    sheet["B33"] = "학식 정보 없음"
-    sheet["B34"] = ", ".join(staff_df.iloc[2]["menu"])
-    sheet["B35"] = ", ".join(staff_df.iloc[3]["menu"])
+    sheet["B33"] = find_menu(tomorrow_date, staff_no, "3")
+    sheet["B34"] = find_menu(tomorrow_date, staff_no, "0")
+    sheet["B35"] = find_menu(tomorrow_date, staff_no, "1")
 
     workbook.save(RENEW_FILE_PATH)
 

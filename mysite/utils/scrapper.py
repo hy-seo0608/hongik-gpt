@@ -11,7 +11,13 @@ import time
 import json
 from collections import OrderedDict
 import re
-from mysite.configure import (
+
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from configure import (
     NOTICE_URL,
     NOTICE_ADD_URL,
     NOTICE_FILE_PATH,

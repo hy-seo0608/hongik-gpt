@@ -12,7 +12,11 @@ import matplotlib.pyplot as plt
 import csv
 from numpy.linalg import norm
 from numpy import dot
-from mysite.configure import ANSWER_FILE_PATH
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from configure import ANSWER_FILE_PATH
 
 # from ..apps import DialogConfig
 

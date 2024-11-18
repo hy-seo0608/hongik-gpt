@@ -1,7 +1,13 @@
 import requests
 import openpyxl
 from datetime import datetime, timedelta
-from mysite.configure import WEATHER_URL
+
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from configure import WEATHER_URL
 
 # OpenWeatherMap API 설정
 

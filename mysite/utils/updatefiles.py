@@ -3,7 +3,12 @@ import time
 import updatefile
 import renew
 import FindAnswer
-from mysite.configure import RENEW_FILE_PATH, ANSWER_FILE_PATH, ANSWER_TEMPLATE_FILE_PATH
+import os
+import sys
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from configure import RENEW_FILE_PATH, ANSWER_FILE_PATH, ANSWER_TEMPLATE_FILE_PATH
 
 
 # 정해진 시간마다 실행할 함수 정의
