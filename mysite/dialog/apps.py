@@ -8,7 +8,7 @@ class DialogConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "dialog"
 
-    # def ready(self):
-    #     if not os.environ.get("APP"):
-    #         os.environ["APP"] = "True"
-    #     from .utils import intent
+    def ready(self):
+        from .corn import main
+
+        main()
