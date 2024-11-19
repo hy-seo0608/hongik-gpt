@@ -31,7 +31,7 @@ from configure import (
 class Scrapper:
     _instance = None
     options = Options()
-    options.add_argument("--headless")
+    # options.add_argument("--headless")
     options.add_argument("--blink-settings=imagesEnabled=false")
     options.add_argument("--no-sandbox")
     options.add_argument("enable-automation")
@@ -40,7 +40,7 @@ class Scrapper:
     browser = webdriver.Chrome(options=options)
 
     stealth(
-        driver,  # driver 객체를 인자로 전달
+        browser,  # driver 객체를 인자로 전달
         languages=["en-US", "en"],
         vendor="Google Inc.",
         platform="Win32",
@@ -178,8 +178,6 @@ if __name__ == "__main__":
     a = Scrapper()
     dormitory_url = "https://www.hongik.ac.kr/kr/life/seoul-cafeteria-view.do?articleNo=5414&restNo=2"
     staff_url = "https://www.hongik.ac.kr/kr/life/seoul-cafeteria-view.do?articleNo=5413&restNo=3"
-    a.get_food_list()
-    # print(a.get_notice())
     # d1 = a.get_phone_number("요건없을걸", 0)
     # d2 = a.get_phone_number("배성일", 1)
     # print(d1)
