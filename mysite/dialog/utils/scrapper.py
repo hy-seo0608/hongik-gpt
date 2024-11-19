@@ -108,16 +108,20 @@ class Scrapper:
         soup = BeautifulSoup(self.browser.page_source, "html.parser")
         try:
             if mode == 1:
-                query_result = soup.find("div", "bn-list-card faculty").ul.li
-                data = OrderedDict()
-                data["name"] = query_result.find("div", "b-name-box").p.text
-                data["belong"] = query_result.find("p", "b-belong").text
-                data["spot"] = query_result.find("p", "b-spot").text
-                data["phone_num"] = query_result.find("a", {"title": "전화걸기"}).text.strip()
+                data_list = []
+                query_result = soup.find("div", "bn-list-card faculty")
+                for query in query_result.ul.find_all("li", recursive=False) :
+                    data = OrderedDict()
+                    data["name"] = query.find("div", "b-name-box").p.text.strip().replace(" ", "")
+                    data["belong"] = query.find("p", "b-belong").text
+                    data["spot"] = query.find("p", "b-spot").text
+                    phone_num = query.find("ul", "ul-type01").li
+                    data["phone_num"] = phone_num.text if phone_num is not None else "전화번호가 없습니다."
+                    data_list.append(data)
 
                 with open("phone_number.json", "w") as f:
-                    json.dump(data, f, ensure_ascii=False, indent="\t")
-                return data
+                    json.dump(data_list, f, ensure_ascii=False, indent="\t")
+                return data_list
             else:
                 data_list = []
                 query_result = soup.find("div", "bn-list-card phone-search")
@@ -125,13 +129,14 @@ class Scrapper:
                     data = OrderedDict()
                     data["name"] = query.find("p").text.strip().replace(" ", "")
                     phone_num = query.find("ul", "ul-type01").li
-                    data["phone_num"] = phone_num.text if phone_num is not None else "there is no phone number"
+                    data["phone_num"] = phone_num.text if phone_num is not None else "전화번호가 없습니다."
                     data_list.append(data)
 
                 with open("phone_number.json", "w") as f:
                     json.dump(data_list, f, ensure_ascii=False, indent="\t")
-                return data
-        except:
+                return data_list
+        except Exception as e:
+            print(e)
             return {}
 
     def get_studyroom_status(self, mode):
@@ -177,9 +182,9 @@ class Scrapper:
                                 "utilization_rate": utilization_rate,
                             }
                         )
-
-            for status in studyroom_status:
-                print(status)
+            # 테스트용
+            # for status in studyroom_status:
+            #     print(status)
             return studyroom_status
         else:
             print("No tables found.")

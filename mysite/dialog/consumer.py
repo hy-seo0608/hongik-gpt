@@ -58,7 +58,6 @@ class DialogConsumer(AsyncJsonWebsocketConsumer):
             if "학관 열람실" in message:
                 status_list = Scrapper().get_studyroom_status(mode=0)
             elif "T동 열람실" in message:
-                print("여기는 실행됨")
                 status_list = Scrapper().get_studyroom_status(mode=1)
             elif "R동 열람실" in message:
                 status_list = Scrapper().get_studyroom_status(mode=2)
@@ -74,9 +73,13 @@ class DialogConsumer(AsyncJsonWebsocketConsumer):
             d2 = Scrapper().get_phone_number(message, 1)  # person
 
             if d1:
-                return_message = f"{d1['name']} 연락처 입니다.\n\n전화번호 :{d1['phone_num']}"
+                return_message = f"{len(d1)}개의 연락처 검색 결과입니다. <br> <br>"
+                for d in d1 : 
+                    return_message += f"소속 : {d['name']} <br> 연락처 : {d['phone_num']} <br> <br>"
             elif d2:
-                return_message = f"{d2['name']}님의 연락처 입니다.\n\n전화번호 :{d2['phone_num']}"
+                return_message = f"{len(d2)}개의 연락처 검색 결과입니다. <br> <br>"
+                for d in d2 : 
+                    return_message += f"성명 : {d['name']} <br> 소속 : {d['belong']} <br> 직책 : {d['spot']} <br> 연락처 : {d['phone_num']} <br> <br>"
             else:
                 return_message = "연락처를 찾을 수 없습니다."
             button_lst = []
