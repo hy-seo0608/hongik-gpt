@@ -11,7 +11,7 @@ import time
 import json
 from collections import OrderedDict
 import re
-
+from selenium_stealth import stealth
 import sys
 import os
 
@@ -31,13 +31,23 @@ from configure import (
 class Scrapper:
     _instance = None
     options = Options()
-    options.add_argument("--headless")
+    # options.add_argument("--headless")
     options.add_argument("--blink-settings=imagesEnabled=false")
     options.add_argument("--no-sandbox")
     options.add_argument("enable-automation")
     options.add_argument("--disable-gpu")
     options.add_argument("--disable-dev-shm-usage")
     browser = webdriver.Chrome(options=options)
+
+    stealth(
+        browser,  # driver 객체를 인자로 전달
+        languages=["en-US", "en"],
+        vendor="Google Inc.",
+        platform="Win32",
+        webgl_vendor="Intel Inc.",
+        renderer="Intel Iris OpenGL Engine",
+        fix_hairline=True,
+    )
 
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
@@ -176,8 +186,6 @@ if __name__ == "__main__":
     a = Scrapper()
     dormitory_url = "https://www.hongik.ac.kr/kr/life/seoul-cafeteria-view.do?articleNo=5414&restNo=2"
     staff_url = "https://www.hongik.ac.kr/kr/life/seoul-cafeteria-view.do?articleNo=5413&restNo=3"
-    a.get_food_list()
-    # print(a.get_notice())
     # d1 = a.get_phone_number("요건없을걸", 0)
     # d2 = a.get_phone_number("배성일", 1)
     # print(d1)
