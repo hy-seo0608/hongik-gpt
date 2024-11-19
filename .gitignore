@@ -7,3 +7,4 @@ mysite/nohup.out
 .idea
 db.sqlite3
 *.json
+configure.py
