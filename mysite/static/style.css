@@ -422,3 +422,44 @@ body {
     grid-template-columns: repeat(3, 1fr);
     gap: 15px; /* 버튼 간 좌우 간격 */
 }
+
+/* 버튼 스타일 */
+.dynamic_button {
+    padding: 5px 10px;
+    /* 내부 여백 최소화 */
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    border: none;
+    text-align: center;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 5px;
+    /* 버튼 간 간격 */
+    white-space: nowrap;
+    /* 텍스트 줄바꿈 방지 */
+    display: inline-block;
+    /* 버튼을 인라인 블록으로 설정 */
+}
+
+/* 버튼 호버 효과 */
+.dynamic_button:hover {
+    background-color: #0056b3;
+}
+
+/* 버튼 컨테이너 스타일 */
+.dynamic_buttons {
+    display: flex;
+    /* 플렉스 레이아웃 사용 */
+    flex-wrap: wrap;
+    /* 줄 바꿈 허용 */
+    justify-content: flex-start;
+    /* 버튼을 왼쪽 정렬 */
+    max-width: 330px;
+    /* 컨테이너 가로 고정 */
+    padding: 10px;
+    /* 컨테이너 내부 여백 최소화 */
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}

@@ -91,8 +91,8 @@ class Scrapper:
         WebDriverWait(self.browser, 30).until(EC.presence_of_element_located((By.CLASS_NAME, "bn-list-card")))
         soup = BeautifulSoup(self.browser.page_source, "html.parser")
         try:
+            data_list = []
             if mode == 1:
-                data_list = []
                 query_result = soup.find("div", "bn-list-card faculty")
                 for query in query_result.ul.find_all("li", recursive=False) :
                     data = OrderedDict()
@@ -102,10 +102,6 @@ class Scrapper:
                     phone_num = query.find("ul", "ul-type01").li
                     data["phone_num"] = phone_num.text if phone_num is not None else "전화번호가 없습니다."
                     data_list.append(data)
-
-                with open("phone_number.json", "w") as f:
-                    json.dump(data_list, f, ensure_ascii=False, indent="\t")
-                return data_list
             else:
                 data_list = []
                 query_result = soup.find("div", "bn-list-card phone-search")
@@ -116,9 +112,9 @@ class Scrapper:
                     data["phone_num"] = phone_num.text if phone_num is not None else "전화번호가 없습니다."
                     data_list.append(data)
 
-                with open("phone_number.json", "w") as f:
-                    json.dump(data_list, f, ensure_ascii=False, indent="\t")
-                return data_list
+            with open(PHONE_NUMBER_FILE_PATH, "w") as f:
+                json.dump(data_list, f, ensure_ascii=False, indent="\t")
+            return data_list
         except Exception as e:
             print(e)
             return {}
@@ -193,3 +189,5 @@ if __name__ == "__main__":
     # a.get_studyroom_status(0)
     # a.get_studyroom_status(1)
     # a.get_studyroom_status(2)
+    a.get_phone_number("안녕하세요", 0)
+    a.get_phone_number('"안녕 하세요"', 0)

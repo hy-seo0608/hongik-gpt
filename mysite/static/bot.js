@@ -195,9 +195,11 @@ function addLoading() {
 
 function addButton(button_list, mode) {
 	const buttonDiv = document.createElement("div");
+	buttonDiv.className = "dynamic_buttons";
 	button_list.forEach((element) => {
 		const button = document.createElement("button");
 		button.textContent = element;
+		button.className = "dynamic_button";
 		button.onclick = function () {
 			handleButtonClick(element, mode);
 		};
@@ -215,9 +217,10 @@ function handleButtonClick(option, mode) {
 
 function addContactButton() {
 	const buttonDiv = document.createElement("div");
-
+	buttonDiv.className = "dynamic_buttons";
 	const button1 = document.createElement("button");
 	button1.textContent = "교직원/교수 연락처";
+	button1.className = "dynamic_button";
 	button1.onclick = function () {
 		addMessage("Bot", "검색하고 싶은 교직원/교수를 입력해주세요");
 		md = 3;
@@ -225,6 +228,7 @@ function addContactButton() {
 
 	const button2 = document.createElement("button");
 	button2.textContent = "학과 연락처";
+	button2.className = "dynamic_button";
 	button2.onclick = function () {
 		addMessage("Bot", "검색하고 싶은 학과를 입력해주세요");
 		md = 3;
