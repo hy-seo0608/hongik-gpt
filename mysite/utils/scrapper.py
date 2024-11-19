@@ -11,7 +11,7 @@ import time
 import json
 from collections import OrderedDict
 import re
-
+from selenium_stealth import stealth
 import sys
 import os
 
@@ -38,6 +38,16 @@ class Scrapper:
     options.add_argument("--disable-gpu")
     options.add_argument("--disable-dev-shm-usage")
     browser = webdriver.Chrome(options=options)
+
+    stealth(
+        driver,  # driver 객체를 인자로 전달
+        languages=["en-US", "en"],
+        vendor="Google Inc.",
+        platform="Win32",
+        webgl_vendor="Intel Inc.",
+        renderer="Intel Iris OpenGL Engine",
+        fix_hairline=True,
+    )
 
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
