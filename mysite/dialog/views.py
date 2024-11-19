@@ -40,7 +40,7 @@ def feedback_save(request):
         response_id = data.get("responseId")  # 응답 ID
 
         # 사용자 질문을 사용하여 예측 클래스와 답변 가져오기
-        best_sim_idx, predicted_sentence = predict(user_question)  # 모델이 예측한 클래스 ID와 질문
+        best_sim_idx, predicted_sentence, cos_sim= predict(user_question)  # 모델이 예측한 클래스 ID와 질문
         model_answer, buttons, mode = FindAnswer(best_sim_idx)  # 예측 클래스에 대한 답변, 버튼, 모드
 
         # 새로운 Feedback 객체를 저장
