@@ -31,5 +31,5 @@ def run_renew():
 def main():
     job()
     sched = BackgroundScheduler()
-    sched.add_job(job, "interval", minutes=1, id="test")
+    sched.add_job(job, "interval", hours=2, id="test")
     sched.start()
