@@ -31,7 +31,7 @@ from configure import (
 class Scrapper:
     _instance = None
     options = Options()
-    # options.add_argument("--headless")
+    options.add_argument("--headless")
     options.add_argument("--blink-settings=imagesEnabled=false")
     options.add_argument("--no-sandbox")
     options.add_argument("enable-automation")
@@ -94,7 +94,7 @@ class Scrapper:
             data_list = []
             if mode == 1:
                 query_result = soup.find("div", "bn-list-card faculty")
-                for query in query_result.ul.find_all("li", recursive=False) :
+                for query in query_result.ul.find_all("li", recursive=False):
                     data = OrderedDict()
                     data["name"] = query.find("div", "b-name-box").p.text.strip().replace(" ", "")
                     data["belong"] = query.find("p", "b-belong").text
