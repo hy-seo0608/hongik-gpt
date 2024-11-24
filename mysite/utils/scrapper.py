@@ -88,7 +88,7 @@ class Scrapper:
             base_url = base_url + f"?mode=list&srSearchKey=onename&srSearchVal={search_query}"
 
         self.browser.get(base_url)
-        WebDriverWait(self.browser, 30).until(EC.presence_of_element_located((By.CLASS_NAME, "bn-list-card")))
+        WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "bn-list-card")))
         soup = BeautifulSoup(self.browser.page_source, "html.parser")
         try:
             data_list = []

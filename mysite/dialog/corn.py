@@ -3,24 +3,25 @@ import schedule
 import time
 from utils import updatefile
 from utils import renew
-from utils import FindAnswer
+from utils.FindAnswer import renew_df
 import os
 from configure import ANSWER_FILE_PATH, ANSWER_TEMPLATE_FILE_PATH, RENEW_FILE_PATH
 
 
-def job():
-    run_updatefile()
-    run_renew()
-    FindAnswer.renew_df()
-    # 정해진 시간마다 실행할 함수 정의
-
-
-def run_updatefile():
-    print("Running updatefile tasks...")
+## 2시간 마다 업데이트
+def interval_job():
+    print("Running interval job tasks...")
     updatefile.update_date(RENEW_FILE_PATH)
-    updatefile.update_food_list(RENEW_FILE_PATH)
     updatefile.update_notice(RENEW_FILE_PATH)
     updatefile.update_weather(RENEW_FILE_PATH)
+    run_renew()
+    renew_df()
+
+
+# 매일 정각에 업데이트
+def daily_job():
+    print("Running daily job tasks...")
+    updatefile.update_food_list(RENEW_FILE_PATH)
 
 
 def run_renew():
@@ -29,7 +30,9 @@ def run_renew():
 
 
 def main():
-    job()
+    interval_job(),
+    daily_job()
     sched = BackgroundScheduler()
-    sched.add_job(job, "interval", hours=2, id="test")
+    sched.add_job(interval_job, "interval", hours=2, id="every_2hour")
+    sched.add_job(daily_job, "cron", hour="0", minute="5", id="daily")
     sched.start()
