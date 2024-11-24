@@ -16,10 +16,11 @@ import sys
 import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from configure import ANSWER_FILE_PATH
+from configure import ANSWER_FILE_PATH, BASE_DIR
 
 # from ..apps import DialogConfig
 
+# ANSWER_FILE_PATH = os.path.join(BASE_DIR, "dataset", "answerfile_test.xlsx")
 
 model = SentenceTransformer("snunlp/KR-SBERT-V40K-klueNLI-augSTS")
 df = pd.read_excel(ANSWER_FILE_PATH)
