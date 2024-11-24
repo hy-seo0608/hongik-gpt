@@ -14,6 +14,11 @@ import re
 from selenium_stealth import stealth
 import sys
 import os
+import re
+
+def remove_special_characters(text):
+    # 한글, 영어, 숫자, 공백만 유지하고 나머지 제거
+    return re.sub(r'[^a-zA-Z0-9\s가-힣]', '', text)
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -81,12 +86,12 @@ class Scrapper:
         ##mode 0 : office , 1 : person
 
         base_url = PHONE_NUMBER_OFFICE_URL if mode == 0 else PHONE_NUMBER_PERSON_URL
-
+        search_query = remove_special_characters(search_query)
         if mode == 0:
             base_url = base_url + f"?mode=list&srSearchKey=name&srSearchVal={search_query}"
         else:
             base_url = base_url + f"?mode=list&srSearchKey=onename&srSearchVal={search_query}"
-
+        
         self.browser.get(base_url)
         WebDriverWait(self.browser, 30).until(EC.presence_of_element_located((By.CLASS_NAME, "bn-list-card")))
         soup = BeautifulSoup(self.browser.page_source, "html.parser")
@@ -189,5 +194,8 @@ if __name__ == "__main__":
     # a.get_studyroom_status(0)
     # a.get_studyroom_status(1)
     # a.get_studyroom_status(2)
-    a.get_phone_number("안녕하세요", 0)
-    a.get_phone_number('"안녕 하세요"', 0)
+    # a.get_phone_number("안녕하세요", 0)
+    # a.get_phone_number('?', 0) 
+    # a.get_phone_number('!', 0)
+    a.get_phone_number('지금 열람실 현황 어때?', 0)
+    a.get_phone_number('지금 열람실 현황 어때?', 1)

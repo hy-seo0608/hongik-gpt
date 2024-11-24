@@ -56,11 +56,12 @@ class DialogConsumer(AsyncJsonWebsocketConsumer):
         elif mode == 2:  # 열람실 현황 크롤링 후 return
             return_message = ""
             status_list = []
-            if "학관 열람실" in message:
+            
+            if "학관" in message or "H" in message or "G" in message:
                 status_list = Scrapper().get_studyroom_status(mode=0)
-            elif "T동 열람실" in message:
+            elif "T" in message:
                 status_list = Scrapper().get_studyroom_status(mode=1)
-            elif "R동 열람실" in message:
+            elif "R" in message:
                 status_list = Scrapper().get_studyroom_status(mode=2)
 
             if status_list:
