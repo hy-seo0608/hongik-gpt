@@ -1,11 +1,13 @@
 const $chatBox = document.getElementById("chat-box");
 const $question = document.querySelector("#question");
 const $submitBtn = document.querySelector("#ask-button");
-const webSocket = new WebSocket("ws://" + window.location.host + "/ws/dialog");
+let webSocket;
 const $$buttons = document.querySelectorAll(".button");
 const $feedback = document.querySelector("#feedback-form");
 const modal = document.querySelector(".modal");
 const $closeButton = document.querySelector("#close-button");
+let timeId;
+let connectInterval;
 $feedback.addEventListener("submit", submitFeedback);
 
 $closeButton.addEventListener("click", (event) => {
@@ -41,44 +43,53 @@ Array.from($$buttons).forEach((button) => {
 		submitMessage(buttonQuestion[index], md);
 	});
 });
-
 //WebSocket methods START
-
-//receive data from server
-webSocket.onmessage = function (event) {
-	received = true;
-	const data = JSON.parse(event.data);
-	$botsChat.querySelector("#message").innerHTML = `<strong>Bot:</strong>${data.message}`;
-	// 챗봇 응답에 피드백 버튼 추가
-	const feedbackButton = addFeedbackButton(data.responseId);
-	feedbackButton.classList.add("feedback-button");
-	$botsChat.appendChild(feedbackButton);
-
-	// 챗봇 답변 메세지
-	currentBotResponse = data.message; // 챗봇 응답 저장
-	// addMessage("Bot", data.message, data.responseId);	// responseId 추가(피드백)
-
-	if (data.mode == 0) {
+const socketConnect = function () {
+	webSocket = new WebSocket("ws://" + window.location.host + "/ws/dialog");
+	webSocket.onopen = function (event) {
+		console.log("socket connected successfully");
 		md = 0;
-	} else if (data.mode == 1) {
-		// 학사일정
-		md = 0;
-		addButton(data.button, data.mode);
-	} else if (data.mode == 2) {
-		// 열람실 현황
-		md = 2;
-		addButton(data.button, data.mode);
-	} else if (data.mode == 3) {
-		// 연락처
-		md = 3;
-		addContactButton();
-	}
-};
+		received = true;
+	};
+	//receive data from server
+	webSocket.onmessage = function (event) {
+		received = true;
+		const data = JSON.parse(event.data);
+		$botsChat.querySelector("#message").innerHTML = `<strong>Bot:</strong>${data.message}`;
+		clearTimeout(timeId);
+		// 챗봇 응답에 피드백 버튼 추가
+		const feedbackButton = addFeedbackButton(data.responseId);
+		feedbackButton.classList.add("feedback-button");
+		$botsChat.appendChild(feedbackButton);
 
-//WebSocket closed unexpectedly
-webSocket.onclose = function (event) {
-	console.error("socket closed unexpectedly");
+		// 챗봇 답변 메세지
+		currentBotResponse = data.message; // 챗봇 응답 저장
+		// addMessage("Bot", data.message, data.responseId);	// responseId 추가(피드백)
+
+		if (data.mode == 0) {
+			md = 0;
+		} else if (data.mode == 1) {
+			// 학사일정
+			md = 0;
+			addButton(data.button, data.mode);
+		} else if (data.mode == 2) {
+			// 열람실 현황
+			md = 2;
+			addButton(data.button, data.mode);
+		} else if (data.mode == 3) {
+			// 연락처
+			md = 3;
+			addContactButton();
+		}
+	};
+
+	//WebSocket closed unexpectedly
+	webSocket.onclose = function (event) {
+		console.error("socket closed unexpectedly");
+		socketConnect();
+	};
 };
+socketConnect();
 
 $question.onkeyup = function (event) {
 	if (event.key === "Enter") {
@@ -191,6 +202,11 @@ function addLoading() {
 	$chatBox.appendChild(loadingDiv);
 	$chatBox.scrollTop = $chatBox.scrollHeight;
 	$botsChat = loadingDiv;
+	timeId = setTimeout(() => {
+		loadingDiv.innerHTML = `<span id="message"><strong>Bot:</strong><div>요청 시간이 초과되었습니다.</div><span> `;
+		received = true;
+		md = 0;
+	}, 5 * 1000);
 }
 
 function addButton(button_list, mode) {
