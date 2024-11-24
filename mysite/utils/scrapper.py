@@ -15,7 +15,7 @@ from selenium_stealth import stealth
 import sys
 import os
 import re
-
+import requests
 def remove_special_characters(text):
     # 한글, 영어, 숫자, 공백만 유지하고 나머지 제거
     return re.sub(r'[^a-zA-Z0-9\s가-힣]', '', text)
@@ -92,9 +92,19 @@ class Scrapper:
         else:
             base_url = base_url + f"?mode=list&srSearchKey=onename&srSearchVal={search_query}"
         
-        self.browser.get(base_url)
-        WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "bn-list-card")))
-        soup = BeautifulSoup(self.browser.page_source, "html.parser")
+        # HTTP 요청 헤더
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+            "Referer": "https://www.hongik.ac.kr/"
+        }
+        
+        # HTTP GET 요청
+        response = requests.get(base_url, headers=headers)
+        
+        # 응답 확인
+        if response.status_code != 200:
+            raise Exception(f"Failed to fetch data. Status code: {response.status_code}")
+        soup = BeautifulSoup(response.text, "html.parser")
         try:
             data_list = []
             if mode == 1:
@@ -197,5 +207,7 @@ if __name__ == "__main__":
     # a.get_phone_number("안녕하세요", 0)
     # a.get_phone_number('?', 0) 
     # a.get_phone_number('!', 0)
-    a.get_phone_number('지금 열람실 현황 어때?', 0)
-    a.get_phone_number('지금 열람실 현황 어때?', 1)
+    print(a.get_phone_number('지금 열람실 현황 어때?', 0))
+    print(a.get_phone_number('지금 열람실 현황 어때?', 1))
+    print(a.get_phone_number('김민', 0))
+    print(a.get_phone_number('김민', 1))
