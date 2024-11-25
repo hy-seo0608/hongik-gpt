@@ -1,7 +1,7 @@
 from .base import *
 
 ALLOWED_HOSTS = ["3.39.93.156"]
-
+DEBUG = False
 
 DATABASES = {
     "default": {
