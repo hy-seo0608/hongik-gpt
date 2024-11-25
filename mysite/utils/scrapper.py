@@ -143,15 +143,26 @@ class Scrapper:
         """
 
         url_to_studyroom_num = {
-            STUDYROOM_URL[0]: 4,
-            STUDYROOM_URL[1]: 4,
-            STUDYROOM_URL[2]: 1,
+            STUDYROOM_URL[0]: 6,
+            STUDYROOM_URL[1]: 6,
+            STUDYROOM_URL[2]: 3,
         }
         base_url = STUDYROOM_URL[mode]
-        self.browser.get(base_url)
-        self.browser.implicitly_wait(10)
-        soup = BeautifulSoup(self.browser.page_source, "html.parser")
+        # HTTP 요청 헤더
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+            "Referer": "https://www.hongik.ac.kr/"
+        }
+        
+        # HTTP GET 요청
+        response = requests.get(base_url, headers=headers)
 
+        # self.browser.get(base_url)
+        # self.browser.implicitly_wait(10)
+        # 응답 확인
+        if response.status_code != 200:
+            raise Exception(f"Failed to fetch data. Status code: {response.status_code}")
+        soup = BeautifulSoup(response.text, "html.parser")
         # Table 찾기
         tables = soup.find_all("table", {"cellpadding": "0", "cellspacing": "0", "border": "0", "width": "100%"})
 
@@ -159,23 +170,24 @@ class Scrapper:
             studyroom_status = []
             for table in tables:
                 rows = table.find_all("tr")
-                for row in rows[2:]:  # 첫 두 행은 제목 행일 가능성이 높으므로 스킵
-                    cols = row.find_all("td")
-                    if len(cols) == 5:  # 열의 개수가 5개인 경우
-                        room_name = cols[0].text.strip()
-                        total_seats = cols[1].text.strip()
-                        used_seats = cols[2].text.strip()
-                        remaining_seats = cols[3].text.strip()
-                        utilization_rate = cols[4].text.strip()
-                        studyroom_status.append(
-                            {
-                                "room_name": room_name,
-                                "total_seats": total_seats,
-                                "used_seats": used_seats,
-                                "remaining_seats": remaining_seats,
-                                "utilization_rate": utilization_rate,
-                            }
-                        )
+                main_col = rows[2].find_all("td")
+                cols = main_col + rows[3].find_all("td")
+                # print(f"{len(cols)}Row data: {[col.text.strip() for col in cols]}")  # 디버깅용
+                for i in range(0, 5 * url_to_studyroom_num[STUDYROOM_URL[mode]], 5) :
+                    room_name = cols[i].text.strip()
+                    total_seats = cols[i+1].text.strip()
+                    used_seats = cols[i+2].text.strip()
+                    remaining_seats = cols[i+3].text.strip()
+                    utilization_rate = cols[i+4].text.strip()
+                    studyroom_status.append(
+                        {
+                            "room_name": room_name,
+                            "total_seats": total_seats,
+                            "used_seats": used_seats,
+                            "remaining_seats": remaining_seats,
+                            "utilization_rate": utilization_rate,
+                        }
+                    )
             # 테스트용
             # for status in studyroom_status:
             #     print(status)
@@ -201,13 +213,13 @@ if __name__ == "__main__":
     # d2 = a.get_phone_number("배성일", 1)
     # print(d1)
     # print(d2)
-    # a.get_studyroom_status(0)
-    # a.get_studyroom_status(1)
-    # a.get_studyroom_status(2)
+    a.get_studyroom_status(0)
+    a.get_studyroom_status(1)
+    a.get_studyroom_status(2)
     # a.get_phone_number("안녕하세요", 0)
     # a.get_phone_number('?', 0) 
     # a.get_phone_number('!', 0)
-    print(a.get_phone_number('지금 열람실 현황 어때?', 0))
-    print(a.get_phone_number('지금 열람실 현황 어때?', 1))
-    print(a.get_phone_number('김민', 0))
-    print(a.get_phone_number('김민', 1))
+    # print(a.get_phone_number('지금 열람실 현황 어때?', 0))
+    # print(a.get_phone_number('지금 열람실 현황 어때?', 1))
+    # print(a.get_phone_number('김민', 0))
+    # print(a.get_phone_number('김민', 1))
