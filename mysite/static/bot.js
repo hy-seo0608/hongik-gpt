@@ -206,7 +206,7 @@ function addLoading() {
 		loadingDiv.innerHTML = `<span id="message"><strong>Bot:</strong><div>요청 시간이 초과되었습니다.</div><span> `;
 		received = true;
 		md = 0;
-	}, 5 * 1000);
+	}, 10 * 1000);
 }
 
 function addButton(button_list, mode) {
@@ -247,7 +247,7 @@ function addContactButton() {
 	button2.className = "dynamic_button";
 	button2.onclick = function () {
 		addMessage("Bot", "검색하고 싶은 학과를 입력해주세요");
-		md = 3;
+		md = 4;
 	};
 
 	buttonDiv.appendChild(button1);
