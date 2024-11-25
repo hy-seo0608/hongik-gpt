@@ -72,17 +72,22 @@ class DialogConsumer(AsyncJsonWebsocketConsumer):
             mode = 0
         elif mode == 3:  # 연락처 크롤링 후 return
 
-            d1 = await get_phone_number(message, 0)  # Office
             d2 = await get_phone_number(message, 1)  # person
 
+            if d2:
+                return_message = f"{len(d2)}개의 연락처 검색 결과입니다. <br> <br>"
+                for d in d2:
+                    return_message += f"성명 : {d['name']} <br> 소속 : {d['belong']} <br> 직책 : {d['spot']} <br> 연락처 : {d['phone_num']} <br> <br>"
+            else:
+                return_message = "연락처를 찾을 수 없습니다."
+            button_lst = []
+            mode = 0
+        elif mode == 4:
+            d1 = await get_phone_number(message, 0)  # Office
             if d1:
                 return_message = f"{len(d1)}개의 연락처 검색 결과입니다. <br> <br>"
                 for d in d1:
                     return_message += f"소속 : {d['name']} <br> 연락처 : {d['phone_num']} <br> <br>"
-            elif d2:
-                return_message = f"{len(d2)}개의 연락처 검색 결과입니다. <br> <br>"
-                for d in d2:
-                    return_message += f"성명 : {d['name']} <br> 소속 : {d['belong']} <br> 직책 : {d['spot']} <br> 연락처 : {d['phone_num']} <br> <br>"
             else:
                 return_message = "연락처를 찾을 수 없습니다."
             button_lst = []
