@@ -206,7 +206,7 @@ function addLoading() {
 		loadingDiv.innerHTML = `<span id="message"><strong>Bot:</strong><div>요청 시간이 초과되었습니다.</div><span> `;
 		received = true;
 		md = 0;
-	}, 5 * 1000);
+	}, 10 * 1000);
 }
 
 function addButton(button_list, mode) {

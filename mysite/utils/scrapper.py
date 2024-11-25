@@ -15,10 +15,13 @@ from selenium_stealth import stealth
 import sys
 import os
 import re
+import requests
+
 
 def remove_special_characters(text):
     # 한글, 영어, 숫자, 공백만 유지하고 나머지 제거
-    return re.sub(r'[^a-zA-Z0-9\s가-힣]', '', text)
+    return re.sub(r"[^a-zA-Z0-9\s가-힣]", "", text)
+
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -82,48 +85,6 @@ class Scrapper:
         with open(NOTICE_FILE_PATH, "w") as f:
             json.dump(data_list, f, ensure_ascii=False, indent="\t")
 
-    def get_phone_number(self, search_query, mode):
-        ##mode 0 : office , 1 : person
-
-        base_url = PHONE_NUMBER_OFFICE_URL if mode == 0 else PHONE_NUMBER_PERSON_URL
-        search_query = remove_special_characters(search_query)
-        if mode == 0:
-            base_url = base_url + f"?mode=list&srSearchKey=name&srSearchVal={search_query}"
-        else:
-            base_url = base_url + f"?mode=list&srSearchKey=onename&srSearchVal={search_query}"
-        
-        self.browser.get(base_url)
-        WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "bn-list-card")))
-        soup = BeautifulSoup(self.browser.page_source, "html.parser")
-        try:
-            data_list = []
-            if mode == 1:
-                query_result = soup.find("div", "bn-list-card faculty")
-                for query in query_result.ul.find_all("li", recursive=False):
-                    data = OrderedDict()
-                    data["name"] = query.find("div", "b-name-box").p.text.strip().replace(" ", "")
-                    data["belong"] = query.find("p", "b-belong").text
-                    data["spot"] = query.find("p", "b-spot").text
-                    phone_num = query.find("ul", "ul-type01").li
-                    data["phone_num"] = phone_num.text if phone_num is not None else "전화번호가 없습니다."
-                    data_list.append(data)
-            else:
-                data_list = []
-                query_result = soup.find("div", "bn-list-card phone-search")
-                for query in query_result.ul.find_all("li", recursive=False):
-                    data = OrderedDict()
-                    data["name"] = query.find("p").text.strip().replace(" ", "")
-                    phone_num = query.find("ul", "ul-type01").li
-                    data["phone_num"] = phone_num.text if phone_num is not None else "전화번호가 없습니다."
-                    data_list.append(data)
-
-            with open(PHONE_NUMBER_FILE_PATH, "w") as f:
-                json.dump(data_list, f, ensure_ascii=False, indent="\t")
-            return data_list
-        except Exception as e:
-            print(e)
-            return {}
-
     def get_studyroom_status(self, mode):
         # mode 0 : 학관, mode 1 : T동, mode 2 : R동
         """
@@ -183,6 +144,56 @@ class Scrapper:
         #     print("Element not found.")
 
 
+async def get_phone_number(search_query, mode):
+    ##mode 0 : office , 1 : person
+
+    base_url = PHONE_NUMBER_OFFICE_URL if mode == 0 else PHONE_NUMBER_PERSON_URL
+    search_query = remove_special_characters(search_query)
+    if mode == 0:
+        base_url = base_url + f"?mode=list&srSearchKey=name&srSearchVal={search_query}"
+    else:
+        base_url = base_url + f"?mode=list&srSearchKey=onename&srSearchVal={search_query}"
+
+    # HTTP 요청 헤더
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+        "Referer": "https://www.hongik.ac.kr/",
+    }
+
+    # HTTP GET 요청
+    response = requests.get(base_url, headers=headers)
+
+    # 응답 확인
+    if response.status_code != 200:
+        raise Exception(f"Failed to fetch data. Status code: {response.status_code}")
+    soup = BeautifulSoup(response.text, "html.parser")
+    try:
+        data_list = []
+        if mode == 1:
+            query_result = soup.find("div", "bn-list-card faculty")
+            for query in query_result.ul.find_all("li", recursive=False):
+                data = OrderedDict()
+                data["name"] = query.find("div", "b-name-box").p.text.strip().replace(" ", "")
+                data["belong"] = query.find("p", "b-belong").text
+                data["spot"] = query.find("p", "b-spot").text
+                phone_num = query.find("ul", "ul-type01").li
+                data["phone_num"] = phone_num.text if phone_num is not None else "전화번호가 없습니다."
+                data_list.append(data)
+        else:
+            data_list = []
+            query_result = soup.find("div", "bn-list-card phone-search")
+            for query in query_result.ul.find_all("li", recursive=False):
+                data = OrderedDict()
+                data["name"] = query.find("p").text.strip().replace(" ", "")
+                phone_num = query.find("ul", "ul-type01").li
+                data["phone_num"] = phone_num.text if phone_num is not None else "전화번호가 없습니다."
+                data_list.append(data)
+        return data_list
+    except Exception as e:
+        print(e)
+        return {}
+
+
 if __name__ == "__main__":
     a = Scrapper()
     dormitory_url = "https://www.hongik.ac.kr/kr/life/seoul-cafeteria-view.do?articleNo=5414&restNo=2"
@@ -195,7 +206,9 @@ if __name__ == "__main__":
     # a.get_studyroom_status(1)
     # a.get_studyroom_status(2)
     # a.get_phone_number("안녕하세요", 0)
-    # a.get_phone_number('?', 0) 
+    # a.get_phone_number('?', 0)
     # a.get_phone_number('!', 0)
-    a.get_phone_number('지금 열람실 현황 어때?', 0)
-    a.get_phone_number('지금 열람실 현황 어때?', 1)
+    print(a.get_phone_number("지금 열람실 현황 어때?", 0))
+    print(a.get_phone_number("지금 열람실 현황 어때?", 1))
+    print(a.get_phone_number("김민", 0))
+    print(a.get_phone_number("김민", 1))
