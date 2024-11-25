@@ -247,7 +247,7 @@ function addContactButton() {
 	button2.className = "dynamic_button";
 	button2.onclick = function () {
 		addMessage("Bot", "검색하고 싶은 학과를 입력해주세요");
-		md = 3;
+		md = 4;
 	};
 
 	buttonDiv.appendChild(button1);
